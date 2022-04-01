@@ -1,0 +1,3 @@
+requests~=2.27.1
+openai~=0.16.0
+deep_translator~=1.8.3
