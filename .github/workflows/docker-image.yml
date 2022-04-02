@@ -23,6 +23,7 @@ jobs:
             pip install -r requirements.txt
             python app.py
         env:
+          TELEGRAM_BOTS: ${{ secrets.TELEGRAM_BOTS }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}   
           QUERY_TEMPLATE: ${{ secrets.QUERY_TEMPLATE }}
