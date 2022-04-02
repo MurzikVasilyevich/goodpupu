@@ -4,6 +4,7 @@ import requests as requests
 from deep_translator import GoogleTranslator
 import openai
 import random
+import ast
 
 
 def open_ai(query_in):
@@ -21,9 +22,11 @@ def open_ai(query_in):
 
 
 def get_word(url, category):
-    request_word = requests.get(url+category)
-    word = request_word.url.split('/')[-1].replace('_', ' ')
-    return word
+    while True:
+        request_word = requests.get(url+category)
+        word = request_word.url.split('/')[-1].replace('_', ' ')
+        if word.find("Category:") == -1:
+            return word
 
 
 def telegram_post(bot_token, chat_id, text):
@@ -35,14 +38,12 @@ def main():
     query = format_query()
     query_fixed = open_ai("Correct this to standard English:\n\n" + query)
     good_pupu_en = open_ai(query_fixed)
+    telegram_bots = ast.literal_eval(os.environ['TELEGRAM_BOTS'])
 
-    good_pupu_ru = GoogleTranslator(source='en', target='ru').translate(good_pupu_en)
-    good_pupu_uk = GoogleTranslator(source='en', target='uk').translate(good_pupu_en)
     bot_token = os.environ['TELEGRAM_BOT_TOKEN']
-
-    telegram_post(bot_token, "@goodpupu", good_pupu_ru)
-    telegram_post(bot_token, "@goodpupua", good_pupu_uk)
-    telegram_post(bot_token, "@goodpoopoo", good_pupu_en)
+    for lang in telegram_bots:
+        telegram_post(bot_token, telegram_bots[lang],
+                      good_pupu_en if lang == 'en' else GoogleTranslator(target=lang).translate(good_pupu_en))
 
 
 def format_query():
