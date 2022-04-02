@@ -1,6 +1,6 @@
 import sys
 import os
-import requests as requests
+import requests
 from deep_translator import GoogleTranslator
 import openai
 import random
@@ -10,7 +10,7 @@ import ast
 def open_ai(query_in):
     openai.api_key = os.environ['OPENAI_API_KEY']
     response = openai.Completion.create(
-        engine="text-davinci-002",
+        engine=os.environ['OPENAI_ENGINE'],
         prompt=query_in,
         temperature=0.7,
         max_tokens=256,
@@ -30,13 +30,12 @@ def get_word(url, category):
 
 
 def telegram_post(bot_token, chat_id, text):
-    requests.post(
-        'https://api.telegram.org/bot{}/sendMessage?chat_id={}&text={}'.format(bot_token, chat_id, text))
+    requests.post(f'https://api.telegram.org/bot{bot_token}/sendMessage?chat_id={chat_id}&text={text}')
 
 
 def main():
     query = format_query()
-    query_fixed = open_ai("Correct this to standard English:\n\n" + query)
+    query_fixed = open_ai(f"Correct this to standard English:\n\n{query}")
     good_pupu_en = open_ai(query_fixed)
     telegram_bots = ast.literal_eval(os.environ['TELEGRAM_BOTS'])
 
