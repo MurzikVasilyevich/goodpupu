@@ -7,6 +7,8 @@ import openai
 import random
 import ast
 from datetime import datetime
+from gtts import gTTS
+import telebot
 
 
 def open_ai(query_in):
@@ -21,11 +23,6 @@ def open_ai(query_in):
         presence_penalty=0
     )
     return response.choices[0].text
-
-
-def telegram_post(bot_token, chat_id, text):
-    return requests.post(
-        f"https://api.telegram.org/bot{bot_token}/sendMessage?chat_id={chat_id}&text={text}&parse_mode=HTML")
 
 
 def main():
@@ -46,14 +43,26 @@ def main():
     telegram_bots = ast.literal_eval(os.environ['TELEGRAM_BOTS'])
 
     bot_token = os.environ['TELEGRAM_BOT_TOKEN']
+    bot = telebot.TeleBot(bot_token, parse_mode=None)
+
     for lang in telegram_bots:
+        chat_id = telegram_bots[lang]
         pure = open_ai_query.query_fixed.replace("Write a ", "").replace("\n", "")
         pure_l = GoogleTranslator(target=lang).translate(open_ai_query.query_fixed.replace("Write a ", ""))
         text = f"{open_ai_query.result}\n\n___\nMurzikVasilyevich\n{dtt}\n<i>{pure}</i>" if lang == 'en' else \
             f"{GoogleTranslator(target=lang).translate(open_ai_query.result)}\n\n___\nMurzikVasilyevich\n{dtt}\n<i>{pure_l}</i>"
 
-        post_response = telegram_post(bot_token, telegram_bots[lang], text)
-        print(post_response.text)
+        post_response = bot.send_message(chat_id, text, parse_mode='HTML')
+
+    for lang in telegram_bots:
+        chat_id = telegram_bots[lang]
+        mytext = open_ai_query.result if lang == 'en' else GoogleTranslator(target=lang).translate(open_ai_query.result)
+        language = lang
+        myobj = gTTS(text=mytext, lang=language, slow=False)
+        myobj.save(f"{lang}.mp3")
+        voice = open(f"{lang}.mp3", 'rb')
+        pure_l = GoogleTranslator(target=lang).translate(open_ai_query.query_fixed.replace("Write a ", ""))
+        bot.send_voice(chat_id, voice, caption=pure_l)
 
 
 class OpenAIQuery:
