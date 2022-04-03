@@ -54,15 +54,12 @@ def main():
 
         post_response = bot.send_message(chat_id, text, parse_mode='HTML')
 
-    for lang in telegram_bots:
         chat_id = telegram_bots[lang]
-        mytext = open_ai_query.result if lang == 'en' else GoogleTranslator(target=lang).translate(open_ai_query.result)
-        language = lang
-        myobj = gTTS(text=mytext, lang=language, slow=False)
+        voice_mytext = open_ai_query.result if lang == 'en' else GoogleTranslator(target=lang).translate(open_ai_query.result)
+        myobj = gTTS(text=voice_mytext, lang=lang, slow=False)
         myobj.save(f"{lang}.mp3")
         voice = open(f"{lang}.mp3", 'rb')
-        pure_l = GoogleTranslator(target=lang).translate(open_ai_query.query_fixed.replace("Write a ", ""))
-        bot.send_voice(chat_id, voice, caption=pure_l)
+        bot.send_voice(chat_id, voice, caption=pure_l, reply_to_message_id=post_response.message_id)
 
 
 class OpenAIQuery:
