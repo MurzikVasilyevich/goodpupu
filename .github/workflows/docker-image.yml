@@ -19,7 +19,7 @@ jobs:
           python-version: 3.9 #install the python needed
       - name: execute py script # run the run.py to get the latest data
         run: |
-            python -m pip install --upgrade pip
+#            python -m pip install --upgrade pip
             pip install -r requirements.txt
             python app.py
         env:
@@ -27,5 +27,5 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}   
           QUERY_TEMPLATE: ${{ secrets.QUERY_TEMPLATE }}
-          WIKI_BASE: "https://en.wikipedia.org/wiki/Special:RandomInCategory/Category:"
-          WIKTIONARY_BASE: "https://en.wiktionary.org/wiki/Special:RandomInCategory/Category:"
+          WIKI_BASE: "https://en.{}.org/wiki/Special:RandomInCategory/Category:"
+          OPENAI_ENGINE: "text-davinci-002"
