@@ -6,6 +6,7 @@ from deep_translator import GoogleTranslator
 import openai
 import random
 import ast
+from datetime import datetime
 
 
 def open_ai(query_in):
