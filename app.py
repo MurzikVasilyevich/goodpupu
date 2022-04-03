@@ -1,3 +1,4 @@
+import json
 import sys
 import os
 import requests
@@ -22,7 +23,8 @@ def open_ai(query_in):
 
 
 def telegram_post(bot_token, chat_id, text):
-    requests.post(f'https://api.telegram.org/bot{bot_token}/sendMessage?chat_id={chat_id}&text={text}')
+    return requests.post(
+        f"https://api.telegram.org/bot{bot_token}/sendMessage?chat_id={chat_id}&text={text}&parse_mode=HTML")
 
 
 def main():
@@ -32,18 +34,25 @@ def main():
     query_template = os.environ['QUERY_TEMPLATE']
     words = Words(wiki_base, genre_categories, parts_of_speech)
     words.get()
+    print(json.dumps(words.words, indent=4))
     initial_query = Query(query_template, words)
-
+    print(initial_query.query)
     open_ai_query = OpenAIQuery(initial_query)
     open_ai_query.process_query()
-    print(open_ai_query)
+    print(open_ai_query.query_fixed)
+    print(open_ai_query.result)
+
     telegram_bots = ast.literal_eval(os.environ['TELEGRAM_BOTS'])
 
     bot_token = os.environ['TELEGRAM_BOT_TOKEN']
     for lang in telegram_bots:
-        telegram_post(bot_token, telegram_bots[lang],
-                      open_ai_query.result if lang == 'en'
-                      else GoogleTranslator(target=lang).translate(open_ai_query.result))
+        pure = open_ai_query.query_fixed.replace("Write a ", "").replace("\n", "")
+        pure_l = GoogleTranslator(target=lang).translate(open_ai_query.query_fixed.replace("Write a ", ""))
+        text = f"{open_ai_query.result}\n\n<i>{pure}</i>" if lang == 'en' else \
+            f"{GoogleTranslator(target=lang).translate(open_ai_query.result)}\n\n<i>{pure_l}</i>"
+
+        post_response = telegram_post(bot_token, telegram_bots[lang], text)
+        print(post_response.text)
 
 
 class OpenAIQuery:
