@@ -1,4 +1,19 @@
 # Poopoo
+The main reason of creating this program is to generate texts about Putin's death.
+
+For me as a proud Citizen of Ukraine, this is something very personal.
+
+Glory to Ukraine! 🇺🇦
+
+
+Post at Medium: [Death of Putin by AI](https://medium.com/@vasilyevichmurzik/death-of-putin-by-ai-351857745641)
+
+Twitter: [MurzikVasich](https://twitter.com/MurzikVasich)
+
+Telegram channels:
+- [Dead Khuilo (EN)](https://t.me/goodpoopoo)
+- [Дохле Хуйло (UA)](https://t.me/goodpupua)
+- [Дохлое Хуйло (RU)](https://t.me/goodpupu)
 
 ## Workflow
 
