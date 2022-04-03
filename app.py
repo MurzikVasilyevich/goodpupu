@@ -48,8 +48,8 @@ def main():
     for lang in telegram_bots:
         pure = open_ai_query.query_fixed.replace("Write a ", "").replace("\n", "")
         pure_l = GoogleTranslator(target=lang).translate(open_ai_query.query_fixed.replace("Write a ", ""))
-        text = f"{open_ai_query.result}\n\n___\n{dtt}\n<i>{pure}</i>" if lang == 'en' else \
-            f"{GoogleTranslator(target=lang).translate(open_ai_query.result)}\n\n___\n{dtt}\n<i>{pure_l}</i>"
+        text = f"{open_ai_query.result}\n\n___\nMurzikVasilyevich\n{dtt}\n<i>{pure}</i>" if lang == 'en' else \
+            f"{GoogleTranslator(target=lang).translate(open_ai_query.result)}\n\n___\nMurzikVasilyevich\n{dtt}\n<i>{pure_l}</i>"
 
         post_response = telegram_post(bot_token, telegram_bots[lang], text)
         print(post_response.text)
