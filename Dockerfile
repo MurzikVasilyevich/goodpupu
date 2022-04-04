@@ -9,8 +9,10 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 RUN hash -r
 
-COPY requirements.txt requirements.txt
-RUN pip install -y sox
-RUN pip3 install -r requirements.txt
-COPY . .
-CMD ["python", "app.py"]
+RUN sox
+
+#COPY requirements.txt requirements.txt
+#RUN pip install -y sox
+#RUN pip3 install -r requirements.txt
+#COPY . .
+#CMD ["python", "app.py"]
