@@ -4,7 +4,8 @@ WORKDIR /app
 
 RUN apt-get update && apt-get install -y \
     sox \
-    libsox-fmt-mp3 \
+    libsox-fmt-all \
+    libsox-dev \
     && rm -rf /var/lib/apt/lists/*
 RUN hash -r
 
