@@ -9,6 +9,8 @@ import ast
 from datetime import datetime
 from gtts import gTTS
 import telebot
+import pandas as pd
+import sox
 
 
 def open_ai(query_in):
@@ -52,13 +54,27 @@ def main():
         text = f"{open_ai_query.result}\n\n___\nMurzikVasilyevich\n{dtt}\n<i>{pure}</i>" if lang == 'en' else \
             f"{GoogleTranslator(target=lang).translate(open_ai_query.result)}\n\n___\nMurzikVasilyevich\n{dtt}\n<i>{pure_l}</i>"
 
-        post_response = bot.send_message(chat_id, text, parse_mode='HTML')
-
         chat_id = telegram_bots[lang]
         voice_mytext = open_ai_query.result if lang == 'en' else GoogleTranslator(target=lang).translate(open_ai_query.result)
         myobj = gTTS(text=voice_mytext, lang=lang, slow=False)
         myobj.save(f"{lang}.mp3")
-        voice = open(f"{lang}.mp3", 'rb')
+        voice_file = f"{lang}.mp3"
+        music_file = get_music()
+        combined_file = f"{lang}_m.mp3"
+        cbn = sox.Combiner()
+        seconds = sox.file_info.duration(voice_file)
+        rate = sox.file_info.sample_rate(voice_file)
+        trn = sox.Transformer()
+        trn.trim(0, seconds)
+        trn.fade(fade_in_len=1, fade_out_len=2)
+        music_file_trimmed = music_file.replace('.mp3', '_trimmed.mp3')
+        trn.set_output_format(rate=rate)
+        trn.build(music_file, music_file_trimmed)
+        cbn.build(
+            [voice_file, music_file_trimmed], combined_file, 'mix', input_volumes=[1, 0.3]
+        )
+        post_response = bot.send_message(chat_id, text, parse_mode='HTML')
+        voice = open(combined_file, 'rb')
         bot.send_voice(chat_id, voice, caption=pure_l, reply_to_message_id=post_response.message_id)
 
 
@@ -114,6 +130,20 @@ class Query:
 
     def get(self):
         return self
+
+
+def get_music():
+    url = "http://ccmixter.org/api/query?f=csv&dataview=links_dl&limit=30&type=instrumentals"
+    df = pd.read_csv(url)
+    audio_url = df.sample(1).iloc[0]['download_url']
+    payload = {}
+    headers = {
+        'Referer': 'http://ccmixter.org/'
+    }
+    filename = audio_url.split("/")[-1]
+    r = requests.get(audio_url, payload, headers=headers)
+    open(filename, 'wb').write(r.content)
+    return filename
 
 
 if __name__ == '__main__':
