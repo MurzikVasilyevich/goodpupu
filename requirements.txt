@@ -5,4 +5,3 @@ gtts~=2.2.4
 pyTelegramBotAPI~=4.4.0
 sox~=1.4.1
 beautifulsoup4
-pysox
