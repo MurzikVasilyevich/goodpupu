@@ -131,6 +131,11 @@ class Query:
     def get(self):
         return self
 
+    def get_adjective(self):
+        url = "https://petscan.wmflabs.org/?format=csv&psid=21808216"
+        df = pd.read_csv(url)
+        self.adjective = df.sample(1).iloc[0]['title'].replace("_", " ")
+
 
 def get_music():
     url = "http://ccmixter.org/api/query?f=csv&dataview=links_dl&limit=30&type=instrumentals"
