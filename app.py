@@ -41,7 +41,7 @@ def main():
     bot_token = s.TELEGRAM_API_KEY
     bot = telebot.TeleBot(bot_token, parse_mode=None)
     broadcast(bot, open_ai_query, telegram_bots, table)
-    broadcast_confirmed(bot, open_ai_query, telegram_bots, table, get_at_confirmed(table))
+    # broadcast_confirmed(bot, open_ai_query, telegram_bots, table, get_at_confirmed(table))
 
 
 def get_at_confirmed(table):
