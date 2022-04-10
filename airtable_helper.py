@@ -24,4 +24,4 @@ class Airtable:
         return queued
 
     def update_published(self):
-        self.table.update(self.queued["fields"]["id"], {"published": True})
+        self.table.update(str(self.queued["id"]), {"published": True})
