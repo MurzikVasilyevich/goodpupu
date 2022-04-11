@@ -1,7 +1,7 @@
 import telebot
 
 import settings as s
-from audio_helper import text_to_speech, add_background_music, create_clip
+from audio_helper import text_to_speech, add_background_music, create_clip, get_video
 import logging.config
 
 logging.config.fileConfig('logging.conf')
