@@ -95,10 +95,6 @@ def create_clip(lang, audio_file):
     else:
         my_clip = my_clip.loop(duration=audio_background.duration)
     my_clip.resize(width=480)
-    if random.randint(0, 1):
-        my_clip.invert_colors()
-    if random.randint(0, 1):
-        my_clip.time_mirror()
     my_clip.audio = audio_background
     my_clip.write_videofile(out_clip, audio=True)
     return out_clip
