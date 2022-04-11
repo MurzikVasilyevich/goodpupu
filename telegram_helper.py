@@ -43,8 +43,7 @@ class Telegram:
             voice = open(combined_file, 'rb')
             if s.CREATE_VIDEO:
                 logger.info(f"Creating video clip for {lang} language")
-                video_file = get_video()
-                out_clip = create_clip(lang, combined_file, video_file)
+                out_clip = create_clip(lang, combined_file)
                 clip = open(out_clip, 'rb')
                 self.bot.send_video(chat_id, clip, caption=query, reply_to_message_id=post_response.message_id)
             else:
