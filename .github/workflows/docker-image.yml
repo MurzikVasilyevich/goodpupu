@@ -26,7 +26,6 @@ jobs:
         env:
           TELEGRAM_BOTS: ${{ secrets.TELEGRAM_BOTS }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}   
-          QUERY_TEMPLATE: ${{ secrets.QUERY_TEMPLATE }}
-          WIKI_BASE: "https://en.{}.org/wiki/Special:RandomInCategory/Category:"
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           OPENAI_ENGINE: "text-davinci-002"
+          AIRTABLE_API_KEY: ${{ secrets.AIRTABLE_API_KEY }}
