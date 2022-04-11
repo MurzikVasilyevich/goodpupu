@@ -5,6 +5,10 @@ import requests
 import sox
 from deep_translator import GoogleTranslator
 from gtts import gTTS
+import moviepy.editor as mpe
+from internetarchive import search_items, download
+import random
+import glob
 
 import settings as s
 import logging.config
@@ -53,3 +57,34 @@ def get_music():
     open(filename, 'wb').write(r.content)
     logger.info(filename)
     return filename
+
+
+def get_video():
+    res = search_items('mediatype:(movies) AND format:(mpeg4)', params={"rows": 30, "page": 1},
+                       fields=['identifier', 'item_size', 'downloads'])
+    item = random.choice(list(filter(lambda x: x["item_size"] < 100000000, res)))
+    logger.info(item)
+    download(item["identifier"], glob_pattern="*.mp4", no_directory=True, verbose=True, destdir="videos")
+    video_file = glob.glob("./videos/*.mp4")[0]
+    return video_file
+
+
+def create_clip(lang, audio_file):
+    video_file = get_video()
+    out_clip = f"./videos/{lang}.mp4"
+    my_clip = mpe.VideoFileClip(video_file)
+    audio_background = mpe.AudioFileClip(audio_file)
+    logger.info(f"Clip duration: {my_clip.duration}")
+    logger.info(f"Audio duration: {audio_background.duration}")
+    if my_clip.duration > audio_background.duration:
+        start = random(0, int(my_clip.duration - audio_background.duration))
+        my_clip = my_clip.subclip(start, start+audio_background.duration)
+    else:
+        my_clip = my_clip.loop(duration=audio_background.duration)
+    my_clip.resize(width=480)
+    final_audio = mpe.CompositeAudioClip([audio_background])
+    final_clip = my_clip.set_audio(final_audio)
+    final_clip.write_videofile(out_clip, codec='mpeg4')
+    return out_clip
+
+

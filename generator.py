@@ -13,6 +13,8 @@ class Generator:
         self.generated_on = datetime.now().strftime("%m/%d/%Y %H:%M:%S")
         if s.CREATE_AUDIO:
             os.path.exists(s.SOUND_FOLDER) or os.makedirs(s.SOUND_FOLDER)
+        if s.CREATE_VIDEO:
+            os.path.exists(s.VIDEO_FOLDER) or os.makedirs(s.VIDEO_FOLDER)
         self.query_template = pd.read_csv("./dictionaries/formats.csv").sample(1).iloc[0]['title']
         self.words = Words()
         self.query = self.query_template.format(**vars(self.words)["words"])
