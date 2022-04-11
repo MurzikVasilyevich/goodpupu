@@ -60,7 +60,7 @@ def get_music():
 
 
 def get_video():
-    res = search_items('mediatype:(movies) AND format:(mpeg4)', params={"rows": 30, "page": 1},
+    res = search_items('mediatype:(movies) AND format:(mpeg4)', params={"rows": 500, "page": 1},
                        fields=['identifier', 'item_size', 'downloads'])
     item = random.choice(list(filter(lambda x: x["item_size"] < 100000000, res)))
     logger.info(item)
