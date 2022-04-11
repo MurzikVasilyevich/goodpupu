@@ -59,20 +59,41 @@ def get_music():
     return filename
 
 
+def download_file(url):
+    local_filename = url.split('/')[-1]
+    # NOTE the stream=True parameter below
+    with requests.get(url, stream=True) as r:
+        r.raise_for_status()
+        with open(f"./videos/{local_filename}", 'wb') as f:
+            for chunk in r.iter_content(chunk_size=8192):
+                # If you have chunk encoded response uncomment if
+                # and set chunk_size parameter to None.
+                #if chunk:
+                f.write(chunk)
+    return local_filename
+
+
 def get_video():
     res = search_items('collection:(moviesandfilms) AND mediatype:(movies) AND format:(mpeg4)',
-                       params={"rows": 500, "page": 1},
+                       params={"rows": 100, "page": 1},
                        fields=['identifier', 'item_size', 'downloads'])
-    item = random.choice(list(filter(lambda x: x["item_size"] < 10000000000, res)))
-    logger.info(item)
-    download(item["identifier"], glob_pattern="*.mp4", no_directory=True, verbose=True, destdir="videos", checksum=True, formats="MPEG4")
-    video_file = glob.glob("./videos/*.mp4")[0]
+    items = random.sample(list(filter(lambda x: x["item_size"] < 10000000000, res)), 10)
+    for item in items:
+        url = "https://archive.org/download/" + item['identifier'] + "/" + item['identifier'] + ".mp4"
+        response = requests.head(url)
+        if response.status_code == 200:
+            video_file = download_file(url)
+            break
+        else:
+            continue
+        # download(item["identifier"], glob_pattern="*.mp4", no_directory=True, verbose=True, destdir="videos", checksum=True, formats="MPEG4")
+        # video_file = glob.glob("./videos/*.mp4")[0]
     return video_file
 
 
-def create_clip(lang, audio_file, video_file):
+def create_clip(lang, audio_file):
     out_clip = f"./videos/{lang}.mp4"
-    my_clip = mpe.VideoFileClip(video_file)
+    my_clip = mpe.VideoFileClip(get_video())
     audio_background = mpe.AudioFileClip(audio_file)
     logger.info(f"Clip duration: {my_clip.duration}")
     logger.info(f"Audio duration: {audio_background.duration}")
