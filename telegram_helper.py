@@ -1,8 +1,11 @@
+import logging.config
+import random
+
+import moviepy.editor as mpe
 import telebot
 
 import settings as s
-from audio_helper import text_to_speech, add_background_music, create_clip, get_video
-import logging.config
+from audio_helper import text_to_speech, add_background_music, create_clip
 
 logging.config.fileConfig('logging.conf')
 logger = logging.getLogger('app.py')
@@ -48,3 +51,5 @@ class Telegram:
                 self.bot.send_video(chat_id, clip, caption=query, reply_to_message_id=post_response.message_id)
             else:
                 self.bot.send_voice(chat_id, voice, caption=query, reply_to_message_id=post_response.message_id)
+
+

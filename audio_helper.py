@@ -3,8 +3,8 @@ import logging.config
 import os
 import random
 import xml.etree.ElementTree as ET
-
 import moviepy.editor as mpe
+
 import pandas as pd
 import requests
 import sox
@@ -80,19 +80,18 @@ def get_video():
     print(filename)
 
     download(item['identifier'], verbose=True, glob_pattern="*.mp4", destdir=s.VIDEO_FOLDER, no_directory=True)
-    return glob.glob(os.path.join(s.VIDEO_FOLDER, "*.mp4"))[0]
+    os.rename(glob.glob(os.path.join(s.VIDEO_FOLDER, "*.mp4"))[0], s.VIDEO_BACK_NAME)
 
 
 def create_clip(lang, audio_file):
     out_clip = f"./videos/{lang}.mp4"
-    videofile = get_video()
-    my_clip = mpe.VideoFileClip(videofile)
+    my_clip = mpe.VideoFileClip(s.VIDEO_BACK_NAME)
     audio_background = mpe.AudioFileClip(audio_file)
     logger.info(f"Clip duration: {my_clip.duration}")
     logger.info(f"Audio duration: {audio_background.duration}")
     if my_clip.duration > audio_background.duration:
         start = random.randint(0, int(my_clip.duration - audio_background.duration))
-        my_clip = my_clip.subclip(start, start+audio_background.duration)
+        my_clip = my_clip.subclip(start, start + audio_background.duration)
     else:
         my_clip = my_clip.loop(duration=audio_background.duration)
     my_clip.resize(width=480)
@@ -100,5 +99,3 @@ def create_clip(lang, audio_file):
     final_clip = my_clip.set_audio(final_audio)
     final_clip.write_videofile(out_clip, codec='mpeg4')
     return out_clip
-
-

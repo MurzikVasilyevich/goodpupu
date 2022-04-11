@@ -1,6 +1,7 @@
 import sys
 
 from airtable_helper import Airtable
+from audio_helper import get_video
 from generator import Generator
 from telegram_helper import Telegram
 
@@ -15,6 +16,7 @@ def main():
     logging.info("Starting Generation is done")
     at = Airtable(gen)
     logging.info("Posted to Airtable")
+    get_video()
     tg = Telegram(at)
 
 
