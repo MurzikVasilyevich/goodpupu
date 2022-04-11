@@ -70,8 +70,7 @@ def get_video():
     return video_file
 
 
-def create_clip(lang, audio_file):
-    video_file = get_video()
+def create_clip(lang, audio_file, video_file):
     out_clip = f"./videos/{lang}.mp4"
     my_clip = mpe.VideoFileClip(video_file)
     audio_background = mpe.AudioFileClip(audio_file)
