@@ -7,3 +7,5 @@ nltk~=3.7
 pandas~=1.4.1
 deep_translator~=1.8.3
 pyTelegramBotAPI~=4.4.0
+internetarchive
+moviepy

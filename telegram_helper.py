@@ -1,7 +1,7 @@
 import telebot
 
 import settings as s
-from audio_helper import text_to_speech, add_background_music
+from audio_helper import text_to_speech, add_background_music, create_clip
 import logging.config
 logging.config.fileConfig('logging.conf')
 logger = logging.getLogger('app.py')
@@ -39,4 +39,10 @@ class Telegram:
         if s.CREATE_AUDIO and combined_file:
             logger.info(f"Uploading audio file for {lang} language")
             voice = open(combined_file, 'rb')
-            self.bot.send_voice(chat_id, voice, caption=query, reply_to_message_id=post_response.message_id)
+            if s.CREATE_VIDEO:
+                logger.info(f"Creating video clip for {lang} language")
+                out_clip = create_clip(lang, combined_file)
+                clip = open(out_clip, 'rb')
+                self.bot.send_video(chat_id, clip, caption=query, reply_to_message_id=post_response.message_id)
+            else:
+                self.bot.send_voice(chat_id, voice, caption=query, reply_to_message_id=post_response.message_id)
