@@ -82,13 +82,12 @@ def get_video():
         url = "https://archive.org/download/" + item['identifier'] + "/" + item['identifier'] + ".mp4"
         response = requests.head(url)
         if response.status_code == 200:
-            video_file = download_file(url)
-            break
+            return download_file(url)
         else:
             continue
         # download(item["identifier"], glob_pattern="*.mp4", no_directory=True, verbose=True, destdir="videos", checksum=True, formats="MPEG4")
         # video_file = glob.glob("./videos/*.mp4")[0]
-    return video_file
+    # return video_file
 
 
 def create_clip(lang, audio_file):
