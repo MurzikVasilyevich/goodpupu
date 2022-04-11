@@ -9,6 +9,7 @@ import moviepy.editor as mpe
 from internetarchive import search_items, download
 import random
 import glob
+import xml.etree.ElementTree as ET
 
 import settings as s
 import logging.config
@@ -64,12 +65,13 @@ def download_file(url):
     # NOTE the stream=True parameter below
     with requests.get(url, stream=True) as r:
         r.raise_for_status()
-        with open(f"./videos/{local_filename}", 'wb') as f:
+        with open(f"./videos/archive.mp4", 'wb') as f:
             for chunk in r.iter_content(chunk_size=8192):
                 # If you have chunk encoded response uncomment if
                 # and set chunk_size parameter to None.
                 #if chunk:
                 f.write(chunk)
+    logger.info(f"Downloaded {local_filename}")
     return local_filename
 
 
@@ -79,10 +81,23 @@ def get_video():
                        fields=['identifier', 'item_size', 'downloads'])
     items = random.sample(list(filter(lambda x: x["item_size"] < 10000000000, res)), 10)
     for item in items:
-        url = "https://archive.org/download/" + item['identifier'] + "/" + item['identifier'] + ".mp4"
-        response = requests.head(url)
-        if response.status_code == 200:
-            return download_file(url)
+        xml_url = "https://archive.org/download/" + item['identifier'] + "/" + item['identifier'] + "_files.xml"
+        r = requests.get(xml_url)
+        root = ET.fromstring(r.content)
+        filename = ""
+        for child in root:
+            if child.attrib['name'].endswith('.mp4'):
+                filename = child.attrib['name']
+                break
+            else:
+                continue
+        print(filename)
+        mp4_url = "https://archive.org/download/" + item['identifier'] + "/" + filename
+        logging.info(mp4_url)
+        response = requests.head(mp4_url)
+        logging.info(response.status_code)
+        if response.status_code in [200, 302]:
+            return download_file(mp4_url)
         else:
             continue
         # download(item["identifier"], glob_pattern="*.mp4", no_directory=True, verbose=True, destdir="videos", checksum=True, formats="MPEG4")
@@ -92,7 +107,8 @@ def get_video():
 
 def create_clip(lang, audio_file):
     out_clip = f"./videos/{lang}.mp4"
-    my_clip = mpe.VideoFileClip(get_video())
+    videofile = get_video()
+    my_clip = mpe.VideoFileClip(videofile)
     audio_background = mpe.AudioFileClip(audio_file)
     logger.info(f"Clip duration: {my_clip.duration}")
     logger.info(f"Audio duration: {audio_background.duration}")
