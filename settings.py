@@ -10,6 +10,7 @@ AIRTABLE_BASE = 'appZxvQ7uCucsSdHI'
 AIRTABLE_TABLE = 'tbluBApx6wGOYs6YN'
 SOUND_FOLDER = "./sounds/"
 VIDEO_FOLDER = "./videos/"
+VIDEO_BACK_NAME = "./videos/archive.mp4"
 GENRES_FILE = "./dictionaries/genres.csv"
 LANGUAGES = ["en", "uk", "ru", "ja"]
 
