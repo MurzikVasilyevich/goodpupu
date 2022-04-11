@@ -1,18 +1,18 @@
+import glob
+import logging.config
 import os
+import random
+import xml.etree.ElementTree as ET
 
+import moviepy.editor as mpe
 import pandas as pd
 import requests
 import sox
-from deep_translator import GoogleTranslator
 from gtts import gTTS
-import moviepy.editor as mpe
 from internetarchive import search_items, download
-import random
-import glob
-import xml.etree.ElementTree as ET
 
 import settings as s
-import logging.config
+
 logging.config.fileConfig('logging.conf')
 logger = logging.getLogger('app.py')
 
@@ -60,21 +60,6 @@ def get_music():
     return filename
 
 
-def download_file(url):
-    local_filename = url.split('/')[-1]
-    # NOTE the stream=True parameter below
-    with requests.get(url, stream=True) as r:
-        r.raise_for_status()
-        with open(f"./videos/archive.mp4", 'wb') as f:
-            for chunk in r.iter_content(chunk_size=8192):
-                # If you have chunk encoded response uncomment if
-                # and set chunk_size parameter to None.
-                #if chunk:
-                f.write(chunk)
-    logger.info(f"Downloaded {local_filename}")
-    return local_filename
-
-
 def get_video():
     res = search_items('collection:(moviesandfilms) AND mediatype:(movies) AND format:(mpeg4)',
                        params={"rows": 100, "page": 1},
@@ -83,6 +68,7 @@ def get_video():
     for item in items:
         xml_url = "https://archive.org/download/" + item['identifier'] + "/" + item['identifier'] + "_files.xml"
         r = requests.get(xml_url)
+        logging.info(f"xml_url: {xml_url}")
         root = ET.fromstring(r.content)
         filename = ""
         for child in root:
@@ -92,17 +78,11 @@ def get_video():
             else:
                 continue
         print(filename)
-        mp4_url = "https://archive.org/download/" + item['identifier'] + "/" + filename
-        logging.info(mp4_url)
-        response = requests.head(mp4_url)
-        logging.info(response.status_code)
-        if response.status_code in [200, 302]:
-            return download_file(mp4_url)
+
+        if download(item['identifier'], verbose=True, glob_pattern="*.mp4", destdir=s.VIDEO_FOLDER, no_directory=True):
+            return glob.glob(os.path.join(s.VIDEO_FOLDER, "*.mp4"))[0]
         else:
             continue
-        # download(item["identifier"], glob_pattern="*.mp4", no_directory=True, verbose=True, destdir="videos", checksum=True, formats="MPEG4")
-        # video_file = glob.glob("./videos/*.mp4")[0]
-    # return video_file
 
 
 def create_clip(lang, audio_file):
