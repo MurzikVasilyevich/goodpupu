@@ -8,7 +8,7 @@ import moviepy.editor as mpe
 import pandas as pd
 import requests
 import sox
-from gtts import gTTS
+from gtts import gTTS, lang
 from internetarchive import search_items, download
 
 import settings as s
@@ -95,6 +95,13 @@ def create_clip(lang, audio_file):
     else:
         my_clip = my_clip.loop(duration=audio_background.duration)
     my_clip.resize(width=480)
+    if random.randint(0, 1):
+        my_clip.invert_colors()
+    if random.randint(0, 1):
+        my_clip.time_mirror()
+    my_clip.audio = audio_background
+    my_clip.write_videofile(out_clip, audio=True)
+    return out_clip
     final_audio = mpe.CompositeAudioClip([audio_background])
     final_clip = my_clip.set_audio(final_audio)
     final_clip.write_videofile(out_clip, codec='mpeg4')
