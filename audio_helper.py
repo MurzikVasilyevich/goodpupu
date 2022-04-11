@@ -77,7 +77,7 @@ def create_clip(lang, audio_file, video_file):
     logger.info(f"Clip duration: {my_clip.duration}")
     logger.info(f"Audio duration: {audio_background.duration}")
     if my_clip.duration > audio_background.duration:
-        start = random.random(0, int(my_clip.duration - audio_background.duration))
+        start = random.randint(0, int(my_clip.duration - audio_background.duration))
         my_clip = my_clip.subclip(start, start+audio_background.duration)
     else:
         my_clip = my_clip.loop(duration=audio_background.duration)
