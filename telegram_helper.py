@@ -3,6 +3,7 @@ import telebot
 import settings as s
 from audio_helper import text_to_speech, add_background_music, create_clip
 import logging.config
+
 logging.config.fileConfig('logging.conf')
 logger = logging.getLogger('app.py')
 
@@ -15,7 +16,8 @@ class Telegram:
         self.key = s.TELEGRAM_API_KEY
         self.queued = self.at.queued
         self.bot = telebot.TeleBot(self.key, parse_mode=None)
-        self.broadcast()
+        if self.queued:
+            self.broadcast()
 
     def broadcast(self):
         logger.info("Starting Telegram messaging")
