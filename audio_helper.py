@@ -62,27 +62,25 @@ def get_music():
 
 def get_video():
     res = search_items('collection:(moviesandfilms) AND mediatype:(movies) AND format:(mpeg4)',
-                       params={"rows": 100, "page": 1},
+                       params={"rows": 50, "page": random.randint(1, 20)},
                        fields=['identifier', 'item_size', 'downloads'])
-    items = random.sample(list(filter(lambda x: x["item_size"] < 10000000000, res)), 10)
-    for item in items:
-        xml_url = "https://archive.org/download/" + item['identifier'] + "/" + item['identifier'] + "_files.xml"
-        r = requests.get(xml_url)
-        logging.info(f"xml_url: {xml_url}")
-        root = ET.fromstring(r.content)
-        filename = ""
-        for child in root:
-            if child.attrib['name'].endswith('.mp4'):
-                filename = child.attrib['name']
-                break
-            else:
-                continue
-        print(filename)
+    item = random.choice(list(res))
 
-        if download(item['identifier'], verbose=True, glob_pattern="*.mp4", destdir=s.VIDEO_FOLDER, no_directory=True):
-            return glob.glob(os.path.join(s.VIDEO_FOLDER, "*.mp4"))[0]
+    xml_url = "https://archive.org/download/" + item['identifier'] + "/" + item['identifier'] + "_files.xml"
+    r = requests.get(xml_url)
+    logging.info(f"xml_url: {xml_url}")
+    root = ET.fromstring(r.content)
+    filename = ""
+    for child in root:
+        if child.attrib['name'].endswith('.mp4'):
+            filename = child.attrib['name']
+            break
         else:
             continue
+    print(filename)
+
+    download(item['identifier'], verbose=True, glob_pattern="*.mp4", destdir=s.VIDEO_FOLDER, no_directory=True)
+    return glob.glob(os.path.join(s.VIDEO_FOLDER, "*.mp4"))[0]
 
 
 def create_clip(lang, audio_file):
