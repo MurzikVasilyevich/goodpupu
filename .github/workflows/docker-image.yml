@@ -2,7 +2,7 @@ name: py
     
 on:
   workflow_dispatch:
-   schedule:
+  schedule:
      - cron: '*/50 * * * *'
 
 jobs:
