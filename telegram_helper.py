@@ -28,13 +28,12 @@ class Telegram:
             text = self.queued["fields"][lang]
             query = self.queued["fields"][f"{lang}_q"]
             post = f"{text}\n\n___\n{self.sign}\n<i>{query}</i>"
-            combined_file = None
 
             # if s.CREATE_AUDIO:
             #     voice_file = text_to_speech(lang, text)
             #     combined_file = add_background_music(lang, voice_file)
             if s.TELEGRAM_POST:
-                self.post(combined_file, lang, query, post)
+                self.post(lang, query, post)
                 self.at.update_published()
 
     def post(self, lang, query, text):
