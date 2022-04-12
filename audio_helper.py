@@ -15,6 +15,7 @@ from gtts import gTTS, lang
 from internetarchive import search_items, download
 from moviepy.audio.fx.audio_fadein import audio_fadein
 from moviepy.audio.fx.audio_fadeout import audio_fadeout
+from moviepy.audio.fx.audio_normalize import audio_normalize
 from moviepy.audio.fx.volumex import volumex
 from moviepy.audio.io.AudioFileClip import AudioFileClip
 
@@ -83,6 +84,8 @@ def create_clip(language, text):
     my_clip = mpe.VideoFileClip(s.VIDEO_BACK_NAME)
     audio_background = AudioFileClip(voice_file)
     music_background = AudioFileClip(music_file)
+
+    audio_normalize(music_background)
     audio_fadein(music_background, 1)
     audio_fadeout(music_background, 2)
     volumex(music_background, 0.2)
