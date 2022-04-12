@@ -86,5 +86,5 @@ def create_clip(lang, audio_file):
     return out_clip
     final_audio = mpe.CompositeAudioClip([audio_background])
     final_clip = my_clip.set_audio(final_audio)
-    final_clip.write_videofile(out_clip)
+    final_clip.write_videofile(out_clip, temp_audiofile='temp-audio.m4a', codec="libx264", audio_codec="aac")
     return out_clip
