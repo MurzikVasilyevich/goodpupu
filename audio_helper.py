@@ -86,7 +86,7 @@ def create_clip(language, text):
     audio_fadein(music_background, 1)
     audio_fadeout(music_background, 2)
     volumex(music_background, 0.2)
-    music_background.duration = audio_background.duration
+    music_background.duration = audio_background.duration + 3
     logger.info(f"Clip duration: {my_clip.duration}")
     logger.info(f"Audio duration: {audio_background.duration}")
     if my_clip.duration > audio_background.duration:
@@ -95,7 +95,8 @@ def create_clip(language, text):
     else:
         my_clip = my_clip.loop(duration=audio_background.duration)
     my_clip.resize(width=480)
-    final_audio = mpe.CompositeAudioClip([audio_background, music_background])
+    final_audio = mpe.CompositeAudioClip([audio_background.set_start(2), music_background])
     final_clip = my_clip.set_audio(final_audio)
+    final_clip.duration = audio_background.duration + 3
     final_clip.write_videofile(out_clip, temp_audiofile='temp-audio.m4a', codec="libx264", audio_codec="aac")
     return out_clip
