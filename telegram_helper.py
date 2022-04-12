@@ -33,7 +33,7 @@ class Telegram:
             #     voice_file = text_to_speech(lang, text)
             #     combined_file = add_background_music(lang, voice_file)
             if s.TELEGRAM_POST:
-                self.post(lang, query, post)
+                self.post(lang, query, post, text)
                 self.at.update_published()
 
     def post(self, lang, query, post, text):
