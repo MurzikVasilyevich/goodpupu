@@ -85,10 +85,10 @@ def create_clip(language, text):
     audio_background = AudioFileClip(voice_file)
     music_background = AudioFileClip(music_file)
 
-    audio_normalize(music_background)
-    audio_fadein(music_background, 1)
-    audio_fadeout(music_background, 2)
-    volumex(music_background, 0.2)
+    music_background = audio_normalize(music_background)
+    music_background = audio_fadein(music_background, 1)
+    music_background = audio_fadeout(music_background, 2)
+    music_background = volumex(music_background, 0.2)
     music_background.duration = audio_background.duration + 3
     logger.info(f"Clip duration: {my_clip.duration}")
     logger.info(f"Audio duration: {audio_background.duration}")
