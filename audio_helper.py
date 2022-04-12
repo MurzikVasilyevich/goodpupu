@@ -99,6 +99,7 @@ def create_clip(language, text):
         my_clip = my_clip.loop(duration=audio_background.duration)
     my_clip.resize(width=480)
     final_audio = mpe.CompositeAudioClip([audio_background.set_start(2), music_background])
+    final_audio.duration = audio_background.duration + 3
     final_clip = my_clip.set_audio(final_audio)
     final_clip.duration = audio_background.duration + 3
     final_clip.write_videofile(out_clip, temp_audiofile='temp-audio.m4a', codec="libx264", audio_codec="aac")
