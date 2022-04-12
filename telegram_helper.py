@@ -36,10 +36,10 @@ class Telegram:
                 self.post(lang, query, post)
                 self.at.update_published()
 
-    def post(self, lang, query, text):
+    def post(self, lang, query, post, text):
         logger.info(f"Posting to telegram for {lang} language")
         chat_id = self.telegram_bots[lang]
-        post_response = self.bot.send_message(chat_id, text, parse_mode='HTML')
+        post_response = self.bot.send_message(chat_id, post, parse_mode='HTML')
         if s.CREATE_AUDIO:
             logger.info(f"Uploading audio file for {lang} language")
             # voice = open(combined_file, 'rb')
