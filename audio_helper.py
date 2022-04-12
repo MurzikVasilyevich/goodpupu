@@ -4,13 +4,19 @@ import os
 import random
 import xml.etree.ElementTree as ET
 import moviepy.editor as mpe
-import moviepy.audio.fx as fx
+from moviepy.audio.AudioClip import AudioClip
+
+
 
 import pandas as pd
 import requests
 import sox
 from gtts import gTTS, lang
 from internetarchive import search_items, download
+from moviepy.audio.fx.audio_fadein import audio_fadein
+from moviepy.audio.fx.audio_fadeout import audio_fadeout
+from moviepy.audio.fx.volumex import volumex
+from moviepy.audio.io.AudioFileClip import AudioFileClip
 
 import settings as s
 
@@ -75,9 +81,11 @@ def create_clip(language, text):
     voice_file = text_to_speech(language, text)
     out_clip = f"./videos/{language}.mp4"
     my_clip = mpe.VideoFileClip(s.VIDEO_BACK_NAME)
-    audio_background = mpe.AudioFileClip(voice_file)
-    music_background = mpe.AudioFileClip(music_file)
-    music_background.fx(fx.audio_fadein, 1).fx(fx.audio_fadeout, 2).fx(fx.multiply_volume, 0.2)
+    audio_background = AudioFileClip(voice_file)
+    music_background = AudioFileClip(music_file)
+    audio_fadein(music_background, 1)
+    audio_fadeout(music_background, 2)
+    volumex(music_background, 0.2)
     music_background.duration = audio_background.duration
     logger.info(f"Clip duration: {my_clip.duration}")
     logger.info(f"Audio duration: {audio_background.duration}")
