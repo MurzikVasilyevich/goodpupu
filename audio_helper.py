@@ -54,7 +54,7 @@ def text_to_speech(language, text):
 
 def get_music():
     logger.info("Downloading random music")
-    url = "http://ccmixter.org/api/query?f=csv&dataview=links_dl&limit=30&type=instrumentals"
+    url = f"http://ccmixter.org/api/query?f=csv&dataview=links_dl&limit=30&offset={random.randint(1,100)}&type=instrumentals"
     df = pd.read_csv(url)
     audio_url = df.sample(1).iloc[0]['download_url']
     payload = {}
