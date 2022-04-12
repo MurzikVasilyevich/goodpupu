@@ -30,26 +30,26 @@ class Telegram:
             post = f"{text}\n\n___\n{self.sign}\n<i>{query}</i>"
             combined_file = None
 
-            if s.CREATE_AUDIO:
-                voice_file = text_to_speech(lang, text)
-                combined_file = add_background_music(lang, voice_file)
+            # if s.CREATE_AUDIO:
+            #     voice_file = text_to_speech(lang, text)
+            #     combined_file = add_background_music(lang, voice_file)
             if s.TELEGRAM_POST:
                 self.post(combined_file, lang, query, post)
                 self.at.update_published()
 
-    def post(self, combined_file, lang, query, text):
+    def post(self, lang, query, text):
         logger.info(f"Posting to telegram for {lang} language")
         chat_id = self.telegram_bots[lang]
         post_response = self.bot.send_message(chat_id, text, parse_mode='HTML')
-        if s.CREATE_AUDIO and combined_file:
+        if s.CREATE_AUDIO:
             logger.info(f"Uploading audio file for {lang} language")
-            voice = open(combined_file, 'rb')
+            # voice = open(combined_file, 'rb')
             if s.CREATE_VIDEO:
                 logger.info(f"Creating video clip for {lang} language")
-                out_clip = create_clip(lang, combined_file)
+                out_clip = create_clip(lang, text)
                 clip = open(out_clip, 'rb')
                 self.bot.send_video(chat_id, clip, caption=query, reply_to_message_id=post_response.message_id)
-            else:
-                self.bot.send_voice(chat_id, voice, caption=query, reply_to_message_id=post_response.message_id)
+            # else:
+            #     self.bot.send_voice(chat_id, voice, caption=query, reply_to_message_id=post_response.message_id)
 
 

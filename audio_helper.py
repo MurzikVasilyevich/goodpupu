@@ -4,6 +4,7 @@ import os
 import random
 import xml.etree.ElementTree as ET
 import moviepy.editor as mpe
+import moviepy.audio.fx as fx
 
 import pandas as pd
 import requests
@@ -17,10 +18,10 @@ logging.config.fileConfig('logging.conf')
 logger = logging.getLogger('app.py')
 
 
-def add_background_music(lang, voice_file):
+def add_background_music(language, voice_file):
     logger.info("Adding background music")
     music_file = get_music()
-    combined_file = os.path.join(s.SOUND_FOLDER, f"{lang}_m.mp3")
+    combined_file = os.path.join(s.SOUND_FOLDER, f"{language}_m.mp3")
     cbn = sox.Combiner()
     cbn.set_input_format(file_type=['mp3', 'mp3'])
     seconds = sox.file_info.duration(voice_file)
@@ -36,10 +37,10 @@ def add_background_music(lang, voice_file):
     return combined_file
 
 
-def text_to_speech(lang, text):
-    logger.info(f"Creating audio for {lang}")
-    voice_file = os.path.join(s.SOUND_FOLDER, f"{lang}.mp3")
-    tts_file = gTTS(text=text, lang=lang, slow=False)
+def text_to_speech(language, text):
+    logger.info(f"Creating audio for {language}")
+    voice_file = os.path.join(s.SOUND_FOLDER, f"{language}.mp3")
+    tts_file = gTTS(text=text, lang=language, slow=False)
     tts_file.save(voice_file)
     return voice_file
 
@@ -69,10 +70,15 @@ def get_video():
     os.rename(glob.glob(os.path.join(s.VIDEO_FOLDER, "*.mp4"))[0], s.VIDEO_BACK_NAME)
 
 
-def create_clip(lang, audio_file):
-    out_clip = f"./videos/{lang}.mp4"
+def create_clip(language, text):
+    music_file = get_music()
+    voice_file = text_to_speech(language, text)
+    out_clip = f"./videos/{language}.mp4"
     my_clip = mpe.VideoFileClip(s.VIDEO_BACK_NAME)
-    audio_background = mpe.AudioFileClip(audio_file)
+    audio_background = mpe.AudioFileClip(voice_file)
+    music_background = mpe.AudioFileClip(music_file)
+    music_background.fx(fx.audio_fadein, 1).fx(fx.audio_fadeout, 2).fx(fx.multiply_volume, 0.2)
+    music_background.duration = audio_background.duration
     logger.info(f"Clip duration: {my_clip.duration}")
     logger.info(f"Audio duration: {audio_background.duration}")
     if my_clip.duration > audio_background.duration:
@@ -81,10 +87,7 @@ def create_clip(lang, audio_file):
     else:
         my_clip = my_clip.loop(duration=audio_background.duration)
     my_clip.resize(width=480)
-    my_clip.audio = audio_background
-    my_clip.write_videofile(out_clip, audio=True)
-    return out_clip
-    final_audio = mpe.CompositeAudioClip([audio_background])
+    final_audio = mpe.CompositeAudioClip([audio_background, music_background])
     final_clip = my_clip.set_audio(final_audio)
     final_clip.write_videofile(out_clip, temp_audiofile='temp-audio.m4a', codec="libx264", audio_codec="aac")
     return out_clip
