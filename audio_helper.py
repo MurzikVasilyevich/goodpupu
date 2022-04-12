@@ -61,24 +61,10 @@ def get_music():
 
 
 def get_video():
-    res = search_items('collection:(moviesandfilms) AND mediatype:(movies) AND format:(mpeg4)',
+    res = search_items('collection:(movies) AND mediatype:(movies) AND format:(mpeg4)',
                        params={"rows": 50, "page": random.randint(1, 20)},
                        fields=['identifier', 'item_size', 'downloads'])
     item = random.choice(list(res))
-
-    xml_url = "https://archive.org/download/" + item['identifier'] + "/" + item['identifier'] + "_files.xml"
-    r = requests.get(xml_url)
-    logging.info(f"xml_url: {xml_url}")
-    root = ET.fromstring(r.content)
-    filename = ""
-    for child in root:
-        if child.attrib['name'].endswith('.mp4'):
-            filename = child.attrib['name']
-            break
-        else:
-            continue
-    print(filename)
-
     download(item['identifier'], verbose=True, glob_pattern="*.mp4", destdir=s.VIDEO_FOLDER, no_directory=True)
     os.rename(glob.glob(os.path.join(s.VIDEO_FOLDER, "*.mp4"))[0], s.VIDEO_BACK_NAME)
 
@@ -100,5 +86,5 @@ def create_clip(lang, audio_file):
     return out_clip
     final_audio = mpe.CompositeAudioClip([audio_background])
     final_clip = my_clip.set_audio(final_audio)
-    final_clip.write_videofile(out_clip, codec='mpeg4')
+    final_clip.write_videofile(out_clip)
     return out_clip
