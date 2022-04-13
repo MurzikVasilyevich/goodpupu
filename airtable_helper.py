@@ -38,6 +38,6 @@ class Airtable:
         resp = self.records_table.update(str(self.queued["id"]), {"published": True})
         logging.info(f"Updating published: {resp}")
 
-    def update_video_url(self, url, lang):
-        resp = self.records_table.update(str(self.queued["id"]), {f"{lang}_v": [{"url": url}]})
+    def update_video_url(self, urls, lang):
+        resp = self.records_table.update(str(self.queued["id"]), {f"{lang}_v": urls})
         logging.info(f"Updating video_url: {resp}")
