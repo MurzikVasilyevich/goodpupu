@@ -47,7 +47,10 @@ class Telegram:
                 logger.info(f"Creating video clip for {lang} language")
                 out_clip = create_clip(lang, text)
                 clip = open(out_clip, 'rb')
-                self.bot.send_video(chat_id, clip, caption=query, reply_to_message_id=post_response.message_id)
+                tg_video = self.bot.send_video(chat_id, clip, caption=query, reply_to_message_id=post_response.message_id)
+                video_url = self.bot.get_file_url(tg_video.video.file_id)
+                self.at.update_video_url(video_url, lang)
+
             # else:
             #     self.bot.send_voice(chat_id, voice, caption=query, reply_to_message_id=post_response.message_id)
 
