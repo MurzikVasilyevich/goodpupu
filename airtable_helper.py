@@ -30,7 +30,7 @@ class Airtable:
 
     def get_confirmed(self):
         queued = self.records_table.first(formula="AND(confirmed=1,published=0,en)")
-        if len(queued) == 0:
+        if not queued:
             logging.info("!!!No queued records!!!")
         return queued
 
