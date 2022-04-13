@@ -40,6 +40,7 @@ class Telegram:
 
     def post(self, lang, query, post, text):
         logger.info(f"Posting to telegram for {lang} language")
+        video_urls = []
         chat_id = self.telegram_bots[lang]
         post_response = self.bot.send_message(chat_id, post, parse_mode='HTML')
         if s.CREATE_AUDIO:
@@ -51,7 +52,11 @@ class Telegram:
                 clip = open(out_clip, 'rb')
                 tg_video = self.bot.send_video(chat_id, clip, caption=query, reply_to_message_id=post_response.message_id)
                 video_url = self.bot.get_file_url(tg_video.video.file_id)
-                self.at.update_video_url(video_url, lang)
+                if video_url:
+                    video_urls.append({"url": video_url})
+
+        if s.CREATE_VIDEO:
+            self.at.update_video_url(video_urls, lang)
 
             # else:
             #     self.bot.send_voice(chat_id, voice, caption=query, reply_to_message_id=post_response.message_id)
