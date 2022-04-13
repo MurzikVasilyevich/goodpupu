@@ -21,6 +21,8 @@ class Telegram:
         self.bot = telebot.TeleBot(self.key, parse_mode=None)
         if self.queued:
             self.broadcast()
+        else:
+            logger.info("No messages to send")
 
     def broadcast(self):
         logger.info("Starting Telegram messaging")
