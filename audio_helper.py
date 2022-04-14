@@ -5,7 +5,7 @@ import random
 import xml.etree.ElementTree as ET
 import moviepy.editor as mpe
 from moviepy.audio.AudioClip import AudioClip
-
+from google.cloud import texttospeech
 
 
 import pandas as pd
@@ -52,6 +52,25 @@ def text_to_speech(language, text):
     return voice_file
 
 
+def text_to_speech_gc(language, text):
+    logger.info(f"Creating audio for {language}")
+    voice_file = os.path.join(s.SOUND_FOLDER, f"{language}.mp3")
+    tts_file = gTTS(text=text, lang=language, slow=False)
+    tts_file.save(voice_file)
+    language_codes = {"en": "en-US", "uk": "uk-UA", "jp": "ja-JP", "ru": "ru-RU"}
+
+    client = texttospeech.TextToSpeechClient()
+    voice_file = os.path.join(s.SOUND_FOLDER, f"{language}.mp3")
+    synthesis_input = texttospeech.SynthesisInput(text=text)
+    voice = texttospeech.VoiceSelectionParams(language_code=language_codes[lang],
+                                              ssml_gender=texttospeech.SsmlVoiceGender.SSML_VOICE_GENDER_UNSPECIFIED)
+    audio_config = texttospeech.AudioConfig(audio_encoding=texttospeech.AudioEncoding.MP3)
+    response = client.synthesize_speech(input=synthesis_input, voice=voice, audio_config=audio_config)
+    with open(voice_file, "wb") as out:
+        out.write(response.audio_content)
+        print(f'Audio content written to file {voice_file}')
+    return voice_file
+
 def get_music():
     logger.info("Downloading random music")
     url = f"http://ccmixter.org/api/query?f=csv&dataview=links_dl&limit=30&offset={random.randint(1,100)}&type=instrumentals"
@@ -79,7 +98,7 @@ def get_video():
 
 def create_clip(language, text):
     music_file = get_music()
-    voice_file = text_to_speech(language, text)
+    voice_file = text_to_speech_gc(language, text)
     out_clip = f"./videos/{language}.mp4"
     my_clip = mpe.VideoFileClip(s.VIDEO_BACK_NAME)
     audio_background = AudioFileClip(voice_file)
