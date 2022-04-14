@@ -23,6 +23,7 @@ jobs:
             python -m pip install --upgrade pip
             pip install -r requirements.txt
             python app.py
+            export GOOGLE_APPLICATION_CREDENTIALS="~/conf.json"
             touch conf.json
             echo $GOOGLE_APPLICATION_CREDENTIALS > ~/conf.json
 
@@ -32,4 +33,3 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           OPENAI_ENGINE: "text-davinci-002"
           AIRTABLE_API_KEY: ${{ secrets.AIRTABLE_API_KEY }}
-          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
