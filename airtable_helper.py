@@ -41,3 +41,7 @@ class Airtable:
     def update_video_url(self, urls, lang):
         resp = self.records_table.update(str(self.queued["id"]), {f"{lang}_v": urls})
         logging.info(f"Updating video_url: {resp}")
+
+    def update_speech_url(self, urls):
+        resp = self.records_table.update(str(self.queued["id"]), {"speech": urls})
+        logging.info(f"Updating video_url: {resp}")
