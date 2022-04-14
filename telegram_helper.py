@@ -54,7 +54,7 @@ class Telegram:
                 tg_video = self.bot.send_video(chat_id, clip, caption=query, reply_to_message_id=post_response.message_id)
                 video_url = self.bot.get_file_url(tg_video.video.file_id)
                 if video_url:
-                    video_urls.append({"url": video_url})''
+                    video_urls.append({"url": video_url})
             # if s.CREATE_AUDIO:
             #     voice = open(f"./sounds/{lang}_m", 'rb')
             #     tg_speech = self.bot.send_voice("@toxic_russia_ru", voice, caption=query)
