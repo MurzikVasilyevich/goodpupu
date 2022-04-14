@@ -33,3 +33,4 @@ jobs:
           OPENAI_ENGINE: "text-davinci-002"
           AIRTABLE_API_KEY: ${{ secrets.AIRTABLE_API_KEY }}
           GOOGLE_SECRET: ${{ secrets.GOOGLE_SECRET }}
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
