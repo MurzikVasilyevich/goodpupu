@@ -62,7 +62,7 @@ def text_to_speech_gc(language, text):
     client = texttospeech.TextToSpeechClient()
     voice_file = os.path.join(s.SOUND_FOLDER, f"{language}.mp3")
     synthesis_input = texttospeech.SynthesisInput(text=text)
-    voice = texttospeech.VoiceSelectionParams(language_code=language_codes[lang],
+    voice = texttospeech.VoiceSelectionParams(language_code=language_codes[language],
                                               ssml_gender=texttospeech.SsmlVoiceGender.SSML_VOICE_GENDER_UNSPECIFIED)
     audio_config = texttospeech.AudioConfig(audio_encoding=texttospeech.AudioEncoding.MP3)
     response = client.synthesize_speech(input=synthesis_input, voice=voice, audio_config=audio_config)
