@@ -39,7 +39,7 @@ def open_ai(query_in):
 
 
 def get_word(pos):
-    words = random.sample(list(wn.all_lemma_names(pos)), 5)
+    words = random.sample(list(wn.all_lemma_names(getattr( wn, pos))), 5)
     return [i.replace("_", " ") for i in words]
 
 
