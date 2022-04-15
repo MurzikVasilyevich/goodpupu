@@ -18,7 +18,7 @@ class Generator:
             os.path.exists(s.VIDEO_FOLDER) or os.makedirs(s.VIDEO_FOLDER)
         self.query_template = get_fmt()
         self.words = Words()
-        self.query = (self.query_template["fields"]["Format"]).format(**vars(self.words)["words"])
+        self.query = (prepare_fmt(self.query_template["fields"]["Format"])).format(**vars(self.words)["words"])
         self.open_ai_result = open_ai("Write a " + self.query).strip()
         self.languages = s.LANGUAGES
         self.translations = Translations(self)
