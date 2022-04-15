@@ -12,6 +12,17 @@ def get_fmt():
     genres_table = Table(s.AIRTABLE_KEY, s.AIRTABLE_BASE, s.AIRTABLE_TABLE_GENRES)
     genres = genres_table.all(formula="Enabled")
     fmt = random.choice(genres)["fields"]["Format"]
+    fmt_prepared = prepare_fmt(fmt)
+    return f"{{genre}} about how {fmt_prepared}"
+
+
+def prepare_fmt(fmt):
+    poss = ["ADJ", "ADV", "NOUN", "VERB"]
+    for pos in poss:
+        op = 0
+        while fmt.find(f"{{{pos}}}") != -1:
+            fmt = fmt.replace(f"{{{pos}}}", f"{{{pos}[{op}]}}", 1)
+            op += 1
     return fmt
 
 
