@@ -11,9 +11,11 @@ logger = logging.getLogger('app.py')
 def get_fmt():
     genres_table = Table(s.AIRTABLE_KEY, s.AIRTABLE_BASE, s.AIRTABLE_TABLE_GENRES)
     genres = genres_table.all(formula="Enabled")
-    fmt = random.choice(genres)["fields"]["Format"]
-    fmt_prepared = prepare_fmt(fmt)
-    return f"{{genre}} about how {fmt_prepared}"
+    fmt = random.choice(genres)
+    # format = fmt["fields"]["Format"]
+    # fmt_prepared = prepare_fmt(fmt)
+    # return f"{{genre}} about how {fmt_prepared}"
+    return fmt
 
 
 def prepare_fmt(fmt):
@@ -36,6 +38,7 @@ class Airtable:
     def post(self):
         logging.info("Posting to Airtable")
         translations = dict(self.gen.translations.texts)
+        translations["Genres"] = [self.gen["id"]]
         translations["datetime"] = self.gen.generated_on
         return self.records_table.create(translations)['id']
 
@@ -55,4 +58,4 @@ class Airtable:
 
     def update_speech_url(self, urls):
         resp = self.records_table.update(str(self.queued["id"]), {"speech": urls})
-        logging.info(f"Updating video_url: {resp}")
+        logging.info(f"Updating speech_url: {resp}")
