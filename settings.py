@@ -13,7 +13,8 @@ SOUND_FOLDER = "./sounds/"
 VIDEO_FOLDER = "./videos/"
 VIDEO_BACK_NAME = "./videos/archive.mp4"
 GENRES_FILE = "./dictionaries/genres.csv"
-LANGUAGES = ["en", "uk", "ru", "ja"]
+LANGUAGES = ["en", "uk", "ru"]
+PARTS_OF_SPEECH = ["ADJ", "ADV", "NOUN", "VERB"]
 
 TELEGRAM_POST = True
 CREATE_AUDIO = True

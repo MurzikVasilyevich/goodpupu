@@ -51,8 +51,7 @@ class Words:
     def get_words(self):
         logging.info("Getting random words")
         self.words["genre"] = pd.read_csv(s.GENRES_FILE).sample(1).iloc[0]['title']
-        self.words["verb"] = [make_3sg_form(i) for i in get_word(wn.VERB)]
-        self.words["noun"] = get_word(wn.NOUN)
-        self.words["adverb"] = get_word(wn.ADV)
-        self.words["adjective"] = get_word(wn.ADJ)
-
+        poss = s.PARTS_OF_SPEECH
+        for pos in poss:
+            self.words[pos] = get_word(pos)
+        self.words["VERB"] = [make_3sg_form(i) for i in self.words["VERB"]]

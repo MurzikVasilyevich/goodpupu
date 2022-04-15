@@ -17,7 +17,7 @@ def get_fmt():
 
 
 def prepare_fmt(fmt):
-    poss = ["ADJ", "ADV", "NOUN", "VERB"]
+    poss = s.PARTS_OF_SPEECH
     for pos in poss:
         op = 0
         while fmt.find(f"{{{pos}}}") != -1:
