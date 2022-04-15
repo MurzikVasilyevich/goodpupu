@@ -38,7 +38,7 @@ class Airtable:
     def post(self):
         logging.info("Posting to Airtable")
         translations = dict(self.gen.translations.texts)
-        translations["Genres"] = [self.gen["id"]]
+        translations["Genres"] = [self.gen.query_template["id"]]
         translations["datetime"] = self.gen.generated_on
         return self.records_table.create(translations)['id']
 
