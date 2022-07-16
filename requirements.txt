@@ -10,3 +10,6 @@ pyTelegramBotAPI~=4.4.0
 internetarchive
 moviepy
 google-cloud-texttospeech
+tqdm
+srt
+ffmpeg-python
