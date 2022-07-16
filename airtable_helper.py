@@ -1,21 +1,24 @@
-import random
-
 from pyairtable import Table
 
 import settings as s
 import logging.config
+import random
+
 logging.config.fileConfig('logging.conf')
 logger = logging.getLogger('app.py')
 
 
-def get_fmt():
+def get_format():
+    formats_table = Table(s.AIRTABLE_KEY, s.AIRTABLE_BASE, s.AIRTABLE_TABLE_FORMATS)
     genres_table = Table(s.AIRTABLE_KEY, s.AIRTABLE_BASE, s.AIRTABLE_TABLE_GENRES)
+    formats = formats_table.all(formula="Enabled")
+    fmt = random.choice(formats)
     genres = genres_table.all(formula="Enabled")
-    fmt = random.choice(genres)
+    gnr = random.choice(genres)
     # format = fmt["fields"]["Format"]
     # fmt_prepared = prepare_fmt(fmt)
     # return f"{{genre}} about how {fmt_prepared}"
-    return fmt
+    return fmt, gnr
 
 
 def prepare_fmt(fmt):
@@ -38,7 +41,8 @@ class Airtable:
     def post(self):
         logging.info("Posting to Airtable")
         translations = dict(self.gen.translations.texts)
-        translations["Genres"] = [self.gen.query_template["id"]]
+        translations["Format"] = [self.gen.fmt["id"]]
+        translations["Genre"] = [self.gen.gnr["id"]]
         translations["datetime"] = self.gen.generated_on
         return self.records_table.create(translations)['id']
 

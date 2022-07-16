@@ -6,6 +6,7 @@ RUN apt-get update && apt-get install -y \
     sox \
     libsox-fmt-all \
     libsox-dev \
+    ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 RUN hash -r
 

@@ -39,7 +39,7 @@ def open_ai(query_in):
 
 
 def get_word(pos):
-    words = random.sample(list(wn.all_lemma_names(getattr( wn, pos))), 5)
+    words = random.sample(list(wn.all_lemma_names(getattr(wn, pos))), 5)
     return [i.replace("_", " ") for i in words]
 
 
@@ -50,7 +50,7 @@ class Words:
 
     def get_words(self):
         logging.info("Getting random words")
-        self.words["genre"] = pd.read_csv(s.GENRES_FILE).sample(1).iloc[0]['title']
+        # self.words["genre"] = pd.read_csv(s.GENRES_FILE).sample(1).iloc[0]['title']
         poss = s.PARTS_OF_SPEECH
         for pos in poss:
             self.words[pos] = get_word(pos)
