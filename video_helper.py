@@ -2,6 +2,7 @@ import logging.config
 import telebot
 import settings as s
 import vimeo
+import urllib.parse
 
 from audio_helper import create_clip
 
@@ -39,7 +40,6 @@ class VideoManager:
 
     def post_vimeo(self, lang, query, text):
         logger.info(f"Posting to vimeo for {lang} language")
-        video_urls = []
 
         logger.info(f"Creating video clip for {lang} language")
         out_clip = create_clip(lang, text, lang in s.VIMEO_LANGUAGES)
@@ -51,9 +51,10 @@ class VideoManager:
                 secret=s.VIMEO_SECRET
             )
             data = {'name': query, 'description': text}
-            video_url = client.upload(out_clip, data=data)
-            if video_url:
-                video_urls.append({"url": video_url})
+            video_id = client.upload(out_clip, data=data)
+            video_url = f"https://vimeo.com/{video_id.split('/')[-1]}"
+            if video_id:
+                self.at.update_vimeo_url(video_url)
             return video_url
         else:
             logger.info(f"{lang} language is not supported")
