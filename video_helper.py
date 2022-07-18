@@ -50,7 +50,8 @@ class VideoManager:
                 key=s.VIMEO_KEY,
                 secret=s.VIMEO_SECRET
             )
-            data = {'name': query, 'description': text}
+            data = {"name": f"{query}", "description": f"{text}"}
+            print(data)
             video_id = client.upload(out_clip, data=data)
             video_url = f"https://vimeo.com/{video_id.split('/')[-1]}"
             if video_id:
