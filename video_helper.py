@@ -1,17 +1,15 @@
 import logging.config
-import random
-
-import moviepy.editor as mpe
 import telebot
-
 import settings as s
+import vimeo
+
 from audio_helper import create_clip
 
 logging.config.fileConfig('logging.conf')
 logger = logging.getLogger('app.py')
 
 
-class Telegram:
+class VideoManager:
     def __init__(self, at):
         self.at = at
         self.telegram_bots = s.TELEGRAM_BOTS
@@ -25,17 +23,43 @@ class Telegram:
             logger.info("No messages to send")
 
     def broadcast(self):
-        logger.info("Starting Telegram messaging")
+        logger.info("Starting VideoManager messaging")
         for lang in self.telegram_bots:
             text = self.queued["fields"][lang]
             query = self.queued["fields"][f"{lang}_q"]
             post = f"{text}\n\n___\n{self.sign}\n<i>{query}</i>"
 
-            if s.TELEGRAM_POST:
-                self.post(lang, query, post, text)
+            if s.POST_TELEGRAM:
+                self.post_telegram(lang, query, post, text)
                 self.at.update_published()
 
-    def post(self, lang, query, post, text):
+            if s.POST_VIMEO:
+                self.post_vimeo(lang, query, text)
+                self.at.update_published()
+
+    def post_vimeo(self, lang, query, text):
+        logger.info(f"Posting to vimeo for {lang} language")
+        video_urls = []
+
+        logger.info(f"Creating video clip for {lang} language")
+        out_clip = create_clip(lang, text, lang in s.VIMEO_LANGUAGES)
+
+        if lang in s.VIMEO_LANGUAGES:
+            client = vimeo.VimeoClient(
+                token=s.VIMEO_TOKEN,
+                key=s.VIMEO_KEY,
+                secret=s.VIMEO_SECRET
+            )
+            data = {'name': query, 'description': text}
+            video_url = client.upload(out_clip, data=data)
+            if video_url:
+                video_urls.append({"url": video_url})
+            return video_url
+        else:
+            logger.info(f"{lang} language is not supported")
+            return None
+
+    def post_telegram(self, lang, query, post, text):
         logger.info(f"Posting to telegram for {lang} language")
         video_urls = []
         chat_id = self.telegram_bots[lang]
