@@ -128,11 +128,17 @@ def get_video():
     os.rename(glob.glob(os.path.join(s.VIDEO_FOLDER, "*.mp4"))[0], s.VIDEO_BACK_NAME)
 
 
-def create_clip(language, text):
+def create_clip(language, text, create_video=True):
     music_file = get_music()
     voice_file, srt_file, en_srt = create_voice_srt(language, text)
-    print(f"Creating clip for {language}")
+    if create_video:
+        return create_video_clip(en_srt, language, music_file, voice_file)
+    else:
+        return None
 
+
+def create_video_clip(en_srt, language, music_file, voice_file):
+    print(f"Creating clip for {language}")
     out_clip = f"./videos/{language}.mp4"
     srt_out_clip = f"./videos/{language}_srt.mp4"
     my_clip = mpe.VideoFileClip(s.VIDEO_BACK_NAME)
@@ -151,7 +157,6 @@ def create_clip(language, text):
     else:
         my_clip = my_clip.loop(duration=audio_background.duration)
     my_clip.resize(width=480)
-
     final_audio = mpe.CompositeAudioClip([audio_background.set_start(s.AUDIO_START), music_background])
     final_audio.duration = audio_background.duration + 3
     final_clip = my_clip.set_audio(final_audio)
@@ -160,5 +165,5 @@ def create_clip(language, text):
                                codec="libx264", audio_codec="aac")
     video = ffmpeg.input(out_clip)
     audio = video.audio
-    ffmpeg.concat(video.filter("subtitles", en_srt), audio, v=1, a=1).output(srt_out_clip).run(overwrite_output=True)
+    ffmpeg.concat(video.filter('subtitles', en_srt), audio, v=1, a=1).output(srt_out_clip).run(overwrite_output=True)
     return srt_out_clip

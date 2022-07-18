@@ -3,7 +3,7 @@ import sys
 from airtable_helper import Airtable
 from audio_helper import get_video
 from generator import Generator
-from telegram_helper import Telegram
+from video_helper import VideoManager
 
 import logging.config
 logging.config.fileConfig('logging.conf')
@@ -17,7 +17,7 @@ def main():
     at = Airtable(gen)
     logging.info("Posted to Airtable")
     get_video()
-    tg = Telegram(at)
+    vm = VideoManager(at)
 
 
 if __name__ == '__main__':

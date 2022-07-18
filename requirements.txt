@@ -13,3 +13,4 @@ google-cloud-texttospeech
 tqdm
 srt
 ffmpeg-python
+PyVimeo

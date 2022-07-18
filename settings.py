@@ -18,7 +18,12 @@ GENRES_FILE = "./dictionaries/genres.csv"
 LANGUAGES = ["en", "uk", "ru"]
 PARTS_OF_SPEECH = ["ADJ", "ADV", "NOUN", "VERB"]
 AUDIO_START = 2
+VIMEO_TOKEN = os.environ["VIMEO_TOKEN"]
+VIMEO_KEY = os.environ["VIMEO_KEY"]
+VIMEO_SECRET = os.environ["VIMEO_SECRET"]
+VIMEO_LANGUAGES = ["uk"]
 
-TELEGRAM_POST = True
+POST_TELEGRAM = False
+POST_VIMEO = True
 CREATE_AUDIO = True
 CREATE_VIDEO = True
