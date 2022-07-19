@@ -22,8 +22,14 @@ VIMEO_TOKEN = os.environ["VIMEO_TOKEN"]
 VIMEO_KEY = os.environ["VIMEO_KEY"]
 VIMEO_SECRET = os.environ["VIMEO_SECRET"]
 VIMEO_LANGUAGES = ["uk"]
+LOCAL_LANGUAGES = ["uk"]
 
 POST_TELEGRAM = False
 POST_VIMEO = True
+
 CREATE_AUDIO = True
 CREATE_VIDEO = True
+STORE_LOCAL = False
+LOCAL_STORAGE = "./results/"
+
+BATCH_SIZE = 10

@@ -1,10 +1,12 @@
 import logging.config
+import shutil
+
 import telebot
 import settings as s
 import vimeo
 import urllib.parse
 
-from audio_helper import create_clip
+from audio_helper import create_clip, get_video
 
 logging.config.fileConfig('logging.conf')
 logger = logging.getLogger('app.py')
@@ -12,6 +14,7 @@ logger = logging.getLogger('app.py')
 
 class VideoManager:
     def __init__(self, at):
+        self.video_back = get_video()
         self.at = at
         self.telegram_bots = s.TELEGRAM_BOTS
         self.sign = s.SIGNATURE
@@ -38,11 +41,20 @@ class VideoManager:
                 self.post_vimeo(lang, query, text)
                 self.at.update_published()
 
+            if s.STORE_LOCAL:
+                self.store_local(lang, text)
+                self.at.update_published()
+
+    def store_local(self, lang, text):
+        logger.info(f"Storing local for {lang} language")
+        out_clip = create_clip(lang, text, self.video_back)
+        shutil.copy(out_clip, f"{s.LOCAL_STORAGE}{lang}/{self.at.queued['fields']['id']}_{lang}.mp4")
+
     def post_vimeo(self, lang, query, text):
         logger.info(f"Posting to vimeo for {lang} language")
 
         logger.info(f"Creating video clip for {lang} language")
-        out_clip = create_clip(lang, text, lang in s.VIMEO_LANGUAGES)
+        out_clip = create_clip(lang, text, self.video_back, lang in s.VIMEO_LANGUAGES)
 
         if lang in s.VIMEO_LANGUAGES:
             client = vimeo.VimeoClient(
@@ -71,7 +83,7 @@ class VideoManager:
 
             if s.CREATE_VIDEO:
                 logger.info(f"Creating video clip for {lang} language")
-                out_clip = create_clip(lang, text)
+                out_clip = create_clip(lang, text, self.video_back)
                 clip = open(out_clip, 'rb')
                 if s.TG_POST_TEXT:
                     tg_video = self.bot.send_video(chat_id, clip,

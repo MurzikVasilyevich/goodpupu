@@ -107,7 +107,7 @@ def get_music():
     offs = random.randint(1, 100)
     url = f"http://ccmixter.org/api/query?f=csv&dataview=links_dl&limit=30&offset={offs}&type=instrumentals"
     df = pd.read_csv(url)
-    audio_url = df.sample(1).iloc[0]['download_url']
+    audio_url = df[df['download_url'].str.contains(".mp3")].sample(1).iloc[0]['download_url']
     payload = {}
     headers = {
         'Referer': 'http://ccmixter.org/'
@@ -124,24 +124,24 @@ def get_video():
                        params={"rows": 50, "page": random.randint(1, 200)},
                        fields=['identifier', 'item_size', 'downloads'])
     item = random.choice(list(res))
-    download(item['identifier'], verbose=True, glob_pattern="*.mp4", destdir=s.VIDEO_FOLDER, no_directory=True)
-    os.rename(glob.glob(os.path.join(s.VIDEO_FOLDER, "*.mp4"))[0], s.VIDEO_BACK_NAME)
+    download(item['identifier'], verbose=True, glob_pattern="*[0-9].mp4", destdir=s.VIDEO_FOLDER, no_directory=True)
+    return glob.glob(os.path.join(s.VIDEO_FOLDER, "*.mp4"))[0]
 
 
-def create_clip(language, text, create_video=True):
+def create_clip(language, text, back_video, create_video=True):
     music_file = get_music()
     voice_file, srt_file, en_srt = create_voice_srt(language, text)
     if create_video:
-        return create_video_clip(en_srt, language, music_file, voice_file)
+        return create_video_clip(en_srt, language, back_video, music_file, voice_file)
     else:
         return None
 
 
-def create_video_clip(en_srt, language, music_file, voice_file):
+def create_video_clip(en_srt, language, back_video, music_file, voice_file):
     print(f"Creating clip for {language}")
     out_clip = f"./videos/{language}.mp4"
     srt_out_clip = f"./videos/{language}_srt.mp4"
-    my_clip = mpe.VideoFileClip(s.VIDEO_BACK_NAME)
+    my_clip = mpe.VideoFileClip(back_video)
     audio_background = AudioFileClip(voice_file)
     music_background = AudioFileClip(music_file)
     music_background = audio_normalize(music_background)
