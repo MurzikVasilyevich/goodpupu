@@ -12,6 +12,11 @@ logging.config.fileConfig('logging.conf')
 logger = logging.getLogger('app.py')
 
 
+def trim_text(query, max_len):
+    trimmed = (query[:max_len - 5] + '..') if len(query) > max_len else query
+    return trimmed
+
+
 class VideoManager:
     def __init__(self, at):
         self.video_back = get_video()
@@ -62,7 +67,10 @@ class VideoManager:
                 key=s.VIMEO_KEY,
                 secret=s.VIMEO_SECRET
             )
-            data = {"name": f"{query}", "description": f"{text}"}
+            data = {
+                "name": trim_text(query, s.VIMEO_TITLE_LENGTH),
+                "description": trim_text(text, s.VIMEO_TITLE_LENGTH)
+                    }
             print(data)
             video_id = client.upload(out_clip, data=data)
             video_url = f"https://vimeo.com/{video_id.split('/')[-1]}"
