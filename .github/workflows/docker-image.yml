@@ -1,9 +1,10 @@
 name: py
     
 on:
+ repository_dispatch:
  workflow_dispatch:
- schedule:
-   - cron: '0 * * * *'
+#  schedule:
+#    - cron: '0 * * * *'
 
 jobs:
   build:
