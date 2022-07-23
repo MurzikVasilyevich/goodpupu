@@ -12,7 +12,6 @@ import requests
 import sox
 from google.cloud.texttospeech_v1beta1 import VoiceSelectionParams, AudioConfig, AudioEncoding, \
     SynthesizeSpeechRequest, SynthesisInput, TextToSpeechClient, SsmlVoiceGender
-from gtts import gTTS
 from internetarchive import search_items, download
 from moviepy.audio.fx.audio_fadein import audio_fadein
 from moviepy.audio.fx.audio_fadeout import audio_fadeout
@@ -43,12 +42,11 @@ def create_voice_srt(language, t):
     voice_file = os.path.join(s.SOUND_FOLDER, f"{language}.mp3")
     srt_file = os.path.join(s.VIDEO_FOLDER, f"{language}.srt")
     en_srt = os.path.join(s.VIDEO_FOLDER, f"en.srt")
-    language_codes = {"en": "en-US", "uk": "uk-UA", "ru": "ru-RU"}
 
     client = TextToSpeechClient()
     tex = text_to_ssml(t)
     synthesis_input = SynthesisInput(ssml=tex["ssml"])
-    voice = VoiceSelectionParams(language_code=language_codes[language],
+    voice = VoiceSelectionParams(language_code=s.LANGUAGE_CODES[language],
                                  ssml_gender=random.choice(list(SsmlVoiceGender)))
     audio_config = AudioConfig(audio_encoding=AudioEncoding.MP3)
     request = SynthesizeSpeechRequest(input=synthesis_input, voice=voice, audio_config=audio_config,
@@ -77,7 +75,7 @@ def create_voice_srt(language, t):
 
 def add_background_music(language, voice_file):
     logger.info("Adding background music")
-    music_file = get_music()
+    music_file = download_music()
     combined_file = os.path.join(s.SOUND_FOLDER, f"{language}_m.mp3")
     cbn = sox.Combiner()
     cbn.set_input_format(file_type=['mp3', 'mp3'])
@@ -94,15 +92,7 @@ def add_background_music(language, voice_file):
     return combined_file
 
 
-def text_to_speech(language, text):
-    logger.info(f"Creating audio for {language}")
-    voice_file = os.path.join(s.SOUND_FOLDER, f"{language}.mp3")
-    tts_file = gTTS(text=text, lang=language, slow=False)
-    tts_file.save(voice_file)
-    return voice_file
-
-
-def get_music():
+def download_music():
     logger.info("Downloading random music")
     offs = random.randint(1, 100)
     url = f"http://ccmixter.org/api/query?f=csv&dataview=links_dl&limit=30&offset={offs}&type=instrumentals"
@@ -119,7 +109,7 @@ def get_music():
     return filename
 
 
-def get_video():
+def download_video():
     res = search_items('collection:(movies) AND mediatype:(movies) AND format:(mpeg4)',
                        params={"rows": 50, "page": random.randint(1, 100)},
                        fields=['identifier', 'item_size', 'downloads'])
@@ -128,35 +118,22 @@ def get_video():
     return glob.glob(os.path.join(s.VIDEO_FOLDER, "*.mp4"))[0]
 
 
-def create_clip(language, text, back_video, create_video=True):
-    music_file = get_music()
+def create_clip(language, text, back_video):
+    music_file = download_music()
     voice_file, srt_file, en_srt = create_voice_srt(language, text)
-    if create_video:
-        return create_video_clip(en_srt, language, back_video, music_file, voice_file)
-    else:
-        return None
+    return create_video_clip(en_srt, language, back_video, music_file, voice_file)
 
 
 def create_video_clip(en_srt, language, back_video, music_file, voice_file):
     print(f"Creating clip for {language}")
     out_clip = f"./videos/{language}.mp4"
     srt_out_clip = f"./videos/{language}_srt.mp4"
-    my_clip = mpe.VideoFileClip(back_video)
-    audio_background = AudioFileClip(voice_file)
-    music_background = AudioFileClip(music_file)
-    music_background = audio_normalize(music_background)
-    music_background = audio_fadein(music_background, 1)
-    music_background = audio_fadeout(music_background, 2)
-    music_background = volumex(music_background, 0.2)
-    music_background.duration = audio_background.duration + 3
-    logger.info(f"Clip duration: {my_clip.duration}")
-    logger.info(f"Audio duration: {audio_background.duration}")
-    if my_clip.duration > audio_background.duration:
-        start = random.randint(0, int(my_clip.duration - audio_background.duration))
-        my_clip = my_clip.subclip(start, start + audio_background.duration)
-    else:
-        my_clip = my_clip.loop(duration=audio_background.duration)
-    my_clip.resize(width=480)
+    audio_background, music_background, my_clip = create_video(back_video, music_file, voice_file)
+    add_srt(audio_background, en_srt, music_background, my_clip, out_clip, srt_out_clip)
+    return srt_out_clip
+
+
+def add_srt(audio_background, en_srt, music_background, my_clip, out_clip, srt_out_clip):
     final_audio = mpe.CompositeAudioClip([audio_background.set_start(s.AUDIO_START), music_background])
     final_audio.duration = audio_background.duration + 3
     final_clip = my_clip.set_audio(final_audio)
@@ -166,4 +143,21 @@ def create_video_clip(en_srt, language, back_video, music_file, voice_file):
     video = ffmpeg.input(out_clip)
     audio = video.audio
     ffmpeg.concat(video.filter('subtitles', en_srt), audio, v=1, a=1).output(srt_out_clip).run(overwrite_output=True)
-    return srt_out_clip
+
+
+def create_video(back_video, music_file, voice_file):
+    my_clip = mpe.VideoFileClip(back_video)
+    audio_background = AudioFileClip(voice_file)
+    music_background = AudioFileClip(music_file)
+    music_background = audio_normalize(music_background)
+    music_background = audio_fadein(music_background, 1)
+    music_background = audio_fadeout(music_background, 2)
+    music_background = volumex(music_background, 0.2)
+    music_background.duration = audio_background.duration + 3
+    if my_clip.duration > audio_background.duration:
+        start = random.randint(0, int(my_clip.duration - audio_background.duration))
+        my_clip = my_clip.subclip(start, start + audio_background.duration)
+    else:
+        my_clip = my_clip.loop(duration=audio_background.duration)
+    my_clip.resize(width=480)
+    return audio_background, music_background, my_clip

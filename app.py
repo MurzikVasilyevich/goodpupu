@@ -2,10 +2,10 @@ import sys
 import time
 
 from airtable_helper import Airtable
-from audio_helper import get_video
-from generator import Generator
-from video_helper import VideoManager
+from publish_helper import VideoManager
 import settings as s
+
+from chunk import Chunk
 
 import logging.config
 logging.config.fileConfig('logging.conf')
@@ -17,15 +17,16 @@ def main():
 
     for i in range(1, s.BATCH_SIZE):
         logging.info(f"Starting batch {i}")
-        gen = Generator()
+        chunk = Chunk()
+        chunk
         logging.info("Starting Generation is done")
-        at = Airtable(gen)
-        logging.info("Posted to Airtable")
-        if s.CREATE_AUDIO:
-            VideoManager(at)
-        logging.info(f"Finished batch {i}")
-        logging.info("Sleeping for 5 seconds")
-        time.sleep(5)
+        # at = Airtable(texter)
+        # logging.info("Posted to Airtable")
+        # if s.CREATE_AUDIO:
+        #     VideoManager(at)
+        # logging.info(f"Finished batch {i}")
+        # logging.info(f"Sleeping for {s.SLEEP_TIME} seconds")
+        # time.sleep(s.SLEEP_TIME)
 
     logging.info("Finished main")
     sys.exit(0)
