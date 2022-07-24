@@ -5,8 +5,8 @@ on:
  workflow_dispatch:
 #  schedule:
 #    - cron: '0 * * * *'
- branches:
-   - tg
+  branches:
+    - tg
 
 jobs:
   build:
