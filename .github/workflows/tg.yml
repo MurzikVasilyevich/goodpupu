@@ -3,10 +3,9 @@ name: tg
 on:
  repository_dispatch:
  workflow_dispatch:
-#  schedule:
+#   schedule:
 #    - cron: '0 * * * *'
-  branches:
-    - tg
+  branch: tg
 
 jobs:
   build:
