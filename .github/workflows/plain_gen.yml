@@ -1,0 +1,40 @@
+name: plain_gen
+    
+on:
+ repository_dispatch:
+ workflow_dispatch:
+#   schedule:
+#    - cron: '0 * * * *'
+  branch: plain_gen
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: first
+
+    steps:
+      - name: checkout repo content
+        uses: actions/checkout@v2 # checkout the repository content to github runner.
+      - name: setup python
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.9 #install the python needed
+      - name: execute py script # run the run.py to get the latest data
+        run: |
+            touch conf.json
+            echo $GOOGLE_SECRET > conf.json
+            sudo apt-get install -y sox libsox-fmt-all libsox-dev ffmpeg
+            python -m pip install --upgrade pip
+            pip install -r requirements.txt
+            python app.py
+        env:
+          TELEGRAM_BOTS: ${{ secrets.TELEGRAM_BOTS }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          OPENAI_ENGINE: "text-davinci-002"
+          AIRTABLE_API_KEY: ${{ secrets.AIRTABLE_API_KEY }}
+          GOOGLE_SECRET: ${{ secrets.GOOGLE_SECRET }}
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+          VIMEO_TOKEN: ${{ secrets.VIMEO_TOKEN }}
+          VIMEO_KEY: ${{ secrets.VIMEO_KEY }}
+          VIMEO_SECRET: ${{ secrets.VIMEO_SECRET }}
