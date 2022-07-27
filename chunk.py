@@ -19,6 +19,8 @@ class Chunk:
         self.generated_on = datetime.now().strftime("%m/%d/%Y %H:%M:%S")
         self.generate = generate
         self.db = Airtable(self)
+        self.record = None
+        self.confirmed = None
         if not self.generate:
             self.record = self.db.get_confirmed()
         if self.record:
