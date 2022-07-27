@@ -20,7 +20,7 @@ class OPENARCHIVE:
 
 
 class DROPBOX:
-    TOKEN = ast.literal_eval(os.environ['DROPBOX_ACCESS_TOKEN'])
+    TOKEN = os.environ['DROPBOX_ACCESS_TOKEN']
 
 
 class TELEGRAM:
