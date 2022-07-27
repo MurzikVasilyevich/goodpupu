@@ -2,6 +2,12 @@ name: py
     
 on:
  repository_dispatch:
+  inputs:
+      batch:
+        description: 'Batch size'     
+        required: false
+        default: 10
+        type: number
  workflow_dispatch:
   inputs:
       batch:
