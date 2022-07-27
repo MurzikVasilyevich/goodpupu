@@ -16,4 +16,4 @@ class Generator:
         init_folder(s.LOCAL.STORAGE)
 
         for lang in s.LINGUISTIC.LANGUAGES:
-            init_folder(f"./{s.LOCAL.STORAGE}/{lang}")
+            init_folder(f"{s.LOCAL.STORAGE}/{lang}")
