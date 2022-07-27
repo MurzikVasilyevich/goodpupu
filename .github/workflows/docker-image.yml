@@ -44,3 +44,4 @@ jobs:
           VIMEO_KEY: ${{ secrets.VIMEO_KEY }}
           VIMEO_SECRET: ${{ secrets.VIMEO_SECRET }}
           DROPBOX_ACCESS_TOKEN: ${{ secrets.DROPBOX_ACCESS_TOKEN }}
+          BATCH: ${{ github.event.inputs.batch }}
