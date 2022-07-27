@@ -3,7 +3,7 @@ import os
 
 
 class POST:
-    GENERATE_RECORDS = eval(capitalize(os.environ['GENERATE_RECORDS']))
+    GENERATE_RECORDS = eval((os.environ['GENERATE_RECORDS']).capitalize())
     TELEGRAM = False
     VIMEO = False
     LOCAL = False
