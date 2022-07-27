@@ -5,7 +5,8 @@ import os
 class POST:
     TELEGRAM = False
     VIMEO = False
-    LOCAL = True
+    LOCAL = False
+    DROPBOX = True
     AIRTABLE = True
     CREATE_AUDIO = True
     CREATE_VIDEO = True
@@ -16,6 +17,10 @@ class POST:
 class OPENARCHIVE:
     MAX_SIZE = 30 * 1024 * 1024
     MAX_RETRIES = 5
+
+
+class DROPBOX:
+    TOKEN = ast.literal_eval(os.environ['DROPBOX_ACCESS_TOKEN'])
 
 
 class TELEGRAM:

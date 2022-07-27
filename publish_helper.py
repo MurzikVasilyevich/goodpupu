@@ -1,8 +1,12 @@
 import logging.config
 import shutil
-
+import os
 import telebot
 import vimeo
+import pathlib
+
+import dropbox
+from dropbox.exceptions import AuthError
 
 import settings as s
 # from video_helper import download_video, create_clip
@@ -14,10 +18,6 @@ logger = logging.getLogger('app.py')
 def trim_text(query, max_len):
     trimmed = (query[:max_len - 5] + '..') if len(query) > max_len else query
     return trimmed
-
-
-
-
 
 class PublishManager:
     def __init__(self, chunk):
@@ -51,7 +51,14 @@ class PublishManager:
                 self.store_local(self.chunk.files.video['srt'][lang], lang)
             if s.POST.TELEGRAM or s.POST.VIMEO or s.POST.LOCAL:
                 self.db.update_status("published", True)
+            if s.POST.DROPBOX:
+                self.store_dropbox(lang)
         logger.info("Finished PublishManager messaging")
+
+    def store_dropbox(self, lang):
+        file = self.chunk.files.video['srt'][lang]
+        filename = os.path.basename(file)
+        dropbox_upload_file(file, filename, f'/poopoo/{lang}/{filename}')
 
     def store_local(self, out_clip, lang):
         logger.info(f"Storing local")
@@ -105,3 +112,36 @@ class PublishManager:
         if s.POST.CREATE_VIDEO:
             self.db.update_status(f"{lang}_v", video_urls)
         logger.info(f"Finished posting to telegram for {lang} language")
+
+
+def dropbox_connect():
+    try:
+        dbx = dropbox.Dropbox(s.DROPBOX.TOKEN)
+    except AuthError as e:
+        print('Error connecting to Dropbox with access token: ' + str(e))
+    return dbx
+
+
+def dropbox_upload_file(local_path, local_file, dropbox_file_path):
+    """Upload a file from the local machine to a path in the Dropbox app directory.
+
+    Args:
+        local_path (str): The path to the local file.
+        local_file (str): The name of the local file.
+        dropbox_file_path (str): The path to the file in the Dropbox app directory.
+
+    Example:
+        dropbox_upload_file('.', 'test.csv', '/stuff/test.csv')
+
+    Returns:
+        meta: The Dropbox file metadata.
+    """
+
+    try:
+        dbx = dropbox_connect()
+        local_file_path = pathlib.Path(local_path) / local_file
+        with local_file_path.open("rb") as f:
+            meta = dbx.files_upload(f.read(), dropbox_file_path, mode=dropbox.files.WriteMode("overwrite"))
+            return meta
+    except Exception as e:
+        print('Error uploading file to Dropbox: ' + str(e))
