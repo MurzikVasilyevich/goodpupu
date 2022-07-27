@@ -55,6 +55,7 @@ class LOCAL:
     SOUND = "./sounds/"
     VIDEO = "./videos/"
     STORAGE = "./results/"
+    CLEAR_EACH_RUN = True
 
 
 class LINGUISTIC:

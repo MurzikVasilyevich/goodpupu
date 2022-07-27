@@ -16,6 +16,8 @@ def main():
     generator.Generator()
 
     for i in range(1, s.POST.BATCH_SIZE):
+        if s.LOCAL.CLEAR_EACH_RUN:
+            generator.Generator()
         logging.info(f"Starting batch {i}")
         chunk = Chunk()
         logging.info("Starting Generation is done")
