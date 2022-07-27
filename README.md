@@ -1,3 +1,5 @@
+[![py](https://github.com/MurzikVasilyevich/goodpupu/actions/workflows/docker-image.yml/badge.svg)](https://github.com/MurzikVasilyevich/goodpupu/actions/workflows/docker-image.yml)
+
 # Poopoo
 The main reason of creating this program is to generate texts about Putin's death.
 
