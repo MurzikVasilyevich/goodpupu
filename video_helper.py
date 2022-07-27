@@ -1,110 +1,80 @@
-import logging.config
-import shutil
+import glob
+import os
+import random
 
-import telebot
+import ffmpeg
+from internetarchive import search_items, download
+from moviepy import editor as mpe
+from moviepy.audio.fx.audio_fadein import audio_fadein
+from moviepy.audio.fx.audio_fadeout import audio_fadeout
+from moviepy.audio.fx.audio_normalize import audio_normalize
+from moviepy.audio.fx.volumex import volumex
+from moviepy.audio.io.AudioFileClip import AudioFileClip
+
 import settings as s
-import vimeo
-import urllib.parse
-
-from audio_helper import create_clip, get_video
-
-logging.config.fileConfig('logging.conf')
-logger = logging.getLogger('app.py')
 
 
-def trim_text(query, max_len):
-    trimmed = (query[:max_len - 5] + '..') if len(query) > max_len else query
-    return trimmed
-
-
-class VideoManager:
-    def __init__(self, at):
-        self.video_back = get_video()
-        self.at = at
-        self.telegram_bots = s.TELEGRAM_BOTS
-        self.sign = s.SIGNATURE
-        self.key = s.TELEGRAM_API_KEY
-        self.queued = self.at.queued
-        self.bot = telebot.TeleBot(self.key, parse_mode=None)
-        if self.queued:
-            self.broadcast()
+def download_video():
+    res = search_items('collection:(movies) AND mediatype:(movies) AND format:(mpeg4)',
+                       params={"rows": 50, "page": random.randint(1, 100)},
+                       fields=['identifier', 'item_size', 'downloads'])
+    retries = 0
+    while True:
+        retries += 1
+        item = random.choice(list(res))
+        if item['item_size'] > s.OPENARCHIVE.MAX_SIZE and retries < s.OPENARCHIVE.MAX_RETRIES:
+            print(f"Item is too big, skipping {item['identifier']}")
+            continue
+        download(item['identifier'], verbose=True, glob_pattern=f"*[0-9].mp4",
+                 destdir=s.LOCAL.VIDEO, no_directory=True)
+        test = glob.glob(os.path.join(s.LOCAL.VIDEO, f"{item['identifier']}*.mp4"))
+        if not test and retries < s.OPENARCHIVE.MAX_RETRIES:
+            print("Download failed, trying again")
+            continue
         else:
-            logger.info("No messages to send")
+            downloaded = test[0]
+            return downloaded
 
-    def broadcast(self):
-        logger.info("Starting VideoManager messaging")
-        for lang in self.telegram_bots:
-            text = self.queued["fields"][lang]
-            query = self.queued["fields"][f"{lang}_q"]
-            post = f"{text}\n\n___\n{self.sign}\n<i>{query}</i>"
 
-            if s.POST_TELEGRAM:
-                self.post_telegram(lang, query, post, text)
-                self.at.update_published()
+def create_video_clip(language, files, srt_lang="en"):
+    id_s = files.chunk.id_s
+    back_video = files.src['video']
+    music_file = files.src['music']
+    voice_file = files.text["voice"][language]
+    print(f"Creating {language} clip for {id_s}")
+    out_clip = f"./videos/{id_s}_{language}.mp4"
+    audio_background, music_background, my_clip = create_video(back_video, music_file, voice_file)
+    srt_file = files.text["srt"][srt_lang]
+    out_clip_srt = f"./videos/{id_s}_{language}_srt_{srt_lang}.mp4"
+    final_audio = mpe.CompositeAudioClip([audio_background.set_start(s.CLIP.AUDIO_START), music_background])
+    final_audio.duration = audio_background.duration + 3
+    final_clip = my_clip.set_audio(final_audio)
+    final_clip.duration = audio_background.duration + 3
+    final_clip.write_videofile(out_clip, temp_audiofile='temp-audio.m4a', remove_temp=True,
+                               codec="libx264", audio_codec="aac")
+    video = ffmpeg.input(out_clip)
+    audio = video.audio
+    add_srt(video, audio, srt_file, out_clip_srt)
+    return out_clip, out_clip_srt
 
-            if s.POST_VIMEO:
-                self.post_vimeo(lang, query, text)
-                self.at.update_published()
 
-            if s.STORE_LOCAL:
-                self.store_local(lang, text)
-                self.at.update_published()
+def add_srt(video, audio, srt, out_clip_srt):
+    ffmpeg.concat(video.filter('subtitles', srt), audio, v=1, a=1).output(out_clip_srt).run(overwrite_output=True)
 
-    def store_local(self, lang, text):
-        logger.info(f"Storing local for {lang} language")
-        out_clip = create_clip(lang, text, self.video_back)
-        shutil.copy(out_clip, f"{s.LOCAL_STORAGE}{lang}/{self.at.queued['fields']['id']}_{lang}.mp4")
 
-    def post_vimeo(self, lang, query, text):
-        logger.info(f"Posting to vimeo for {lang} language")
-
-        logger.info(f"Creating video clip for {lang} language")
-        out_clip = create_clip(lang, text, self.video_back, lang in s.VIMEO_LANGUAGES)
-
-        if lang in s.VIMEO_LANGUAGES:
-            client = vimeo.VimeoClient(
-                token=s.VIMEO_TOKEN,
-                key=s.VIMEO_KEY,
-                secret=s.VIMEO_SECRET
-            )
-            data = {
-                "name": trim_text(query, s.VIMEO_TITLE_LENGTH),
-                "description": trim_text(text, s.VIMEO_TITLE_LENGTH)
-                    }
-            print(data)
-            video_id = client.upload(out_clip, data=data)
-            video_url = f"https://vimeo.com/{video_id.split('/')[-1]}"
-            if video_id:
-                self.at.update_vimeo_url(video_url)
-            return video_url
-        else:
-            logger.info(f"{lang} language is not supported")
-            return None
-
-    def post_telegram(self, lang, query, post, text):
-        logger.info(f"Posting to telegram for {lang} language")
-        video_urls = []
-        chat_id = self.telegram_bots[lang]
-        if s.TG_POST_TEXT:
-            post_response = self.bot.send_message(chat_id, post, parse_mode='HTML')
-        if s.CREATE_AUDIO:
-            logger.info(f"Uploading audio file for {lang} language")
-
-            if s.CREATE_VIDEO:
-                logger.info(f"Creating video clip for {lang} language")
-                out_clip = create_clip(lang, text, self.video_back)
-                clip = open(out_clip, 'rb')
-                if s.TG_POST_TEXT:
-                    tg_video = self.bot.send_video(chat_id, clip,
-                                                   caption=query,
-                                                   reply_to_message_id=post_response.message_id)
-                else:
-                    tg_video = self.bot.send_video(chat_id, clip,
-                                                   caption=query)
-                video_url = self.bot.get_file_url(tg_video.video.file_id)
-                if video_url:
-                    video_urls.append({"url": video_url})
-
-        if s.CREATE_VIDEO:
-            self.at.update_video_url(video_urls, lang)
-
+def create_video(back_video, music_file, voice_file):
+    my_clip = mpe.VideoFileClip(back_video)
+    audio_background = AudioFileClip(voice_file)
+    music_background = AudioFileClip(music_file)
+    music_background = audio_normalize(music_background)
+    music_background = audio_fadein(music_background, 1)
+    music_background = audio_fadeout(music_background, 2)
+    music_background = volumex(music_background, 0.2)
+    music_background.duration = audio_background.duration + 3
+    if my_clip.duration > audio_background.duration:
+        start = random.randint(0, int(my_clip.duration - audio_background.duration))
+        my_clip = my_clip.subclip(start, start + audio_background.duration)
+    else:
+        my_clip = my_clip.loop(duration=audio_background.duration)
+    my_clip.resize(width=480)
+    return audio_background, music_background, my_clip

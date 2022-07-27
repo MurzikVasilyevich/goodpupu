@@ -1,13 +1,11 @@
+import logging.config
 import sys
 import time
 
-from airtable_helper import Airtable
-from audio_helper import get_video
-from generator import Generator
-from video_helper import VideoManager
 import settings as s
+from chunk import Chunk
+from publish_helper import PublishManager
 
-import logging.config
 logging.config.fileConfig('logging.conf')
 logger = logging.getLogger('app.py')
 
@@ -15,17 +13,15 @@ logger = logging.getLogger('app.py')
 def main():
     logging.info("Starting main")
 
-    for i in range(1, s.BATCH_SIZE):
+    for i in range(1, s.POST.BATCH_SIZE):
         logging.info(f"Starting batch {i}")
-        gen = Generator()
+        chunk = Chunk()
         logging.info("Starting Generation is done")
-        at = Airtable(gen)
-        logging.info("Posted to Airtable")
-        if s.CREATE_AUDIO:
-            VideoManager(at)
+        if s.POST.CREATE_AUDIO:
+            PublishManager(chunk)
         logging.info(f"Finished batch {i}")
-        logging.info("Sleeping for 5 seconds")
-        time.sleep(5)
+        logging.info(f"Sleeping for {s.POST.SLEEP_TIME} seconds")
+        time.sleep(s.POST.SLEEP_TIME)
 
     logging.info("Finished main")
     sys.exit(0)
