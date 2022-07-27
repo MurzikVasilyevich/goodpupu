@@ -9,7 +9,7 @@ class POST:
     AIRTABLE = True
     CREATE_AUDIO = True
     CREATE_VIDEO = True
-    BATCH_SIZE = 10
+    BATCH_SIZE = 2
     SLEEP_TIME = 5
 
 
