@@ -8,6 +8,7 @@ on:
         description: 'Batch size'     
         required: false
         default: 10
+        type: number
  schedule:
     - cron: '*/15 * * * *'
 
