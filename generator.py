@@ -14,3 +14,6 @@ class Generator:
         init_folder(s.LOCAL.SOUND)
         init_folder(s.LOCAL.VIDEO)
         init_folder(s.LOCAL.STORAGE)
+
+        for lang in s.LINGUISTIC.LANGUAGES:
+            init_folder(f"./{s.LOCAL.STORAGE}/{lang}")
