@@ -31,6 +31,7 @@ jobs:
             sudo apt-get install -y sox libsox-fmt-all libsox-dev ffmpeg
             python -m pip install --upgrade pip
             pip install -r requirements.txt
+            sudo ARCH=amd64 GCLOUD_STACK_ID="407650" GCLOUD_API_KEY="eyJrIjoiMzUxMDQ1NDI3NzgzNzg5ZGE2MDFlOWM0OGQzOTY1YWM5NjAzN2E5ZCIsIm4iOiJzdGFjay00MDc2NTAtZWFzeXN0YXJ0LWdjb20iLCJpZCI6Njg1MzYwfQ==" GCLOUD_API_URL="https://integrations-api-us-central.grafana.net" /bin/sh -c "$(curl -fsSL https://raw.githubusercontent.com/grafana/agent/release/production/grafanacloud-install.sh)"
             python app.py
 
         env:
