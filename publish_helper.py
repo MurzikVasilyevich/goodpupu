@@ -9,6 +9,7 @@ import dropbox
 from dropbox.exceptions import AuthError
 
 import settings as s
+
 # from video_helper import download_video, create_clip
 
 logging.config.fileConfig('logging.conf')
@@ -18,6 +19,7 @@ logger = logging.getLogger('app.py')
 def trim_text(query, max_len):
     trimmed = (query[:max_len - 5] + '..') if len(query) > max_len else query
     return trimmed
+
 
 class PublishManager:
     def __init__(self, chunk):
@@ -49,16 +51,17 @@ class PublishManager:
                 self.post_vimeo(out_clip, lang, query, text)
             if s.POST.LOCAL:
                 self.store_local(self.chunk.files.video['srt'][lang], lang)
-            if s.POST.TELEGRAM or s.POST.VIMEO or s.POST.LOCAL:
-                self.db.update_status("published", True)
             if s.POST.DROPBOX:
                 self.store_dropbox(lang)
+            if s.POST.TELEGRAM or s.POST.VIMEO or s.POST.LOCAL or s.POST.DROPBOX:
+                self.db.update_status("published", True)
         logger.info("Finished PublishManager messaging")
 
     def store_dropbox(self, lang):
+        logger.info(f"Storing to dropbox for {lang} language")
         file = self.chunk.files.video['srt'][lang]
         filename = os.path.basename(file)
-        dropbox_upload_file(file, filename, f'/poopoo/{lang}/{filename}')
+        dropbox_upload_file(s.LOCAL.VIDEO, filename, f'/poopoo/{lang}/{filename}')
 
     def store_local(self, out_clip, lang):
         logger.info(f"Storing local")
@@ -75,7 +78,7 @@ class PublishManager:
             data = {
                 "name": trim_text(query, s.VIMEO.TITLE_LENGTH),
                 "description": trim_text(text, s.VIMEO.DESCRIPTION_LENGTH)
-                    }
+            }
             print(data)
             video_id = client.upload(out_clip, data=data)
             video_url = f"https://vimeo.com/{video_id.split('/')[-1]}"
