@@ -3,7 +3,7 @@ import os
 
 
 class POST:
-    GENERATE_RECORDS = True
+    GENERATE_RECORDS = eval(os.environ['GENERATE_RECORDS'])
     TELEGRAM = False
     VIMEO = False
     LOCAL = False
