@@ -5,6 +5,7 @@ import time
 import settings as s
 from chunk import Chunk
 from publish_helper import PublishManager
+import generator
 
 logging.config.fileConfig('logging.conf')
 logger = logging.getLogger('app.py')
@@ -12,6 +13,7 @@ logger = logging.getLogger('app.py')
 
 def main():
     logging.info("Starting main")
+    generator.Generator()
 
     for i in range(1, s.POST.BATCH_SIZE):
         logging.info(f"Starting batch {i}")
