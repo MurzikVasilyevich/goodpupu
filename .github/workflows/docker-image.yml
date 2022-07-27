@@ -2,12 +2,6 @@ name: py
     
 on:
  repository_dispatch:
-  inputs:
-      batch:
-        description: 'Batch size'     
-        required: false
-        default: 10
-        type: number
  workflow_dispatch:
   inputs:
       batch:
@@ -51,4 +45,4 @@ jobs:
           VIMEO_KEY: ${{ secrets.VIMEO_KEY }}
           VIMEO_SECRET: ${{ secrets.VIMEO_SECRET }}
           DROPBOX_ACCESS_TOKEN: ${{ secrets.DROPBOX_ACCESS_TOKEN }}
-          BATCH: ${{ github.event.inputs.batch }}
+          BATCH: ${{ github.event.client_payload.batch }}
