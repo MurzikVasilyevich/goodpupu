@@ -38,12 +38,12 @@ class Chunk:
 
 class Source:
     def __init__(self, chunk):
+        self.genre = None
+        self.format = None
         logging.info("Getting source")
         self.chunk = chunk
-        if self.chunk.confirmed:
-            self.format = self.chunk.record["fields"]["Format"]
-            self.genre = self.chunk.record["fields"]["Genre"]
-        else:
+        
+        if not self.chunk.confirmed:
             self.get_format()
             self.get_genre()
 

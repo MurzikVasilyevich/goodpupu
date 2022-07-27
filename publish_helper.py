@@ -16,9 +16,7 @@ def trim_text(query, max_len):
     return trimmed
 
 
-def store_local(out_clip, lang):
-    logger.info(f"Storing local")
-    shutil.move(out_clip, f"{s.LOCAL.STORAGE}{lang}/")
+
 
 
 class PublishManager:
@@ -50,10 +48,14 @@ class PublishManager:
             if s.POST.VIMEO:
                 self.post_vimeo(out_clip, lang, query, text)
             if s.POST.LOCAL:
-                store_local(self.chunk.files.video['srt'][lang], lang)
+                self.store_local(self.chunk.files.video['srt'][lang], lang)
             if s.POST.TELEGRAM or s.POST.VIMEO or s.POST.LOCAL:
                 self.db.update_status("published", True)
         logger.info("Finished PublishManager messaging")
+
+    def store_local(self, out_clip, lang):
+        logger.info(f"Storing local")
+        shutil.move(out_clip, f"{s.LOCAL.STORAGE}{lang}/")
 
     def post_vimeo(self, out_clip, lang, query, text):
         logger.info(f"Posting to vimeo for {lang} language")
