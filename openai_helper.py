@@ -4,7 +4,7 @@ import settings as s
 
 
 def open_ai(query_in):
-    openai.api_key = s.OPENAI_API_KEY
+    openai.api_key = s.OPENAI.API_KEY
     response = openai.Completion.create(
         engine='text-davinci-002',
         prompt=query_in,

@@ -33,14 +33,14 @@ class Words:
 
     def get_words(self):
         logging.info("Getting random words")
-        poss = s.PARTS_OF_SPEECH
+        poss = s.LINGUISTIC.PARTS_OF_SPEECH
         for pos in poss:
             self.words[pos] = get_word(pos)
         self.words["VERB"] = [make_3sg_form(i) for i in self.words["VERB"]]
 
 
 def prepare_fmt(fmt):
-    poss = s.PARTS_OF_SPEECH
+    poss = s.LINGUISTIC.PARTS_OF_SPEECH
     for pos in poss:
         op = 0
         while fmt.find(f"{{{pos}}}") != -1:
