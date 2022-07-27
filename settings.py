@@ -3,6 +3,7 @@ import os
 
 
 class POST:
+    GENERATE_RECORDS = True
     TELEGRAM = False
     VIMEO = False
     LOCAL = False
@@ -10,7 +11,7 @@ class POST:
     AIRTABLE = True
     CREATE_AUDIO = True
     CREATE_VIDEO = True
-    BATCH_SIZE = 100
+    BATCH_SIZE = 10
     SLEEP_TIME = 5
 
 
@@ -55,7 +56,7 @@ class LOCAL:
     SOUND = "./sounds/"
     VIDEO = "./videos/"
     STORAGE = "./results/"
-    CLEAR_EACH_RUN = True
+    CLEAR_EACH_RUN = False
 
 
 class LINGUISTIC:

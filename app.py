@@ -19,9 +19,9 @@ def main():
         if s.LOCAL.CLEAR_EACH_RUN:
             generator.Generator()
         logging.info(f"Starting batch {i}")
-        chunk = Chunk()
+        chunk = Chunk(s.POST.GENERATE_RECORDS)
         logging.info("Starting Generation is done")
-        if s.POST.CREATE_AUDIO:
+        if s.POST.CREATE_AUDIO and not s.POST.GENERATE_RECORDS:
             PublishManager(chunk)
         logging.info(f"Finished batch {i}")
         logging.info(f"Sleeping for {s.POST.SLEEP_TIME} seconds")

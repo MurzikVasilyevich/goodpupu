@@ -19,7 +19,8 @@ class Chunk:
         self.generated_on = datetime.now().strftime("%m/%d/%Y %H:%M:%S")
         self.generate = generate
         self.db = Airtable(self)
-        self.record = self.db.get_confirmed()
+        if not self.generate:
+            self.record = self.db.get_confirmed()
         if self.record:
             self.confirmed = self.record["fields"]["confirmed"]
             self.source = Source(self)
@@ -28,7 +29,10 @@ class Chunk:
             self.id_s = f"{self.record['fields']['id']:06}"
             self.files = Files(self, download_video(), download_music())
         else:
-            logger.info("No queued records found")
+            if not self.generate:
+                logger.info("No queued records found")
+            else:
+                logger.info("Starting to generate records")
             self.source = Source(self)
             self.texter = Texter(self)
             self.record = self.db.post()
