@@ -15,7 +15,7 @@ def main():
     logging.info("Starting main")
     generator.Generator()
 
-    for i in range(1, s.POST.BATCH_SIZE):
+    for i in range(1, s.POST.BATCH_SIZE + 1):
         if s.LOCAL.CLEAR_EACH_RUN:
             generator.Generator()
         logging.info(f"Starting batch {i}")
