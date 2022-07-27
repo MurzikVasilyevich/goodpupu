@@ -3,6 +3,11 @@ name: py
 on:
  repository_dispatch:
  workflow_dispatch:
+  inputs:
+      batch:
+        description: 'Batch size'     
+        required: false
+        default: 10
   schedule:
     - cron: '*/15 * * * *'
 
