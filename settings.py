@@ -64,7 +64,7 @@ class LOCAL:
 
 
 class LINGUISTIC:
-    LANGUAGES = ["en", "uk", "ru"]
+    LANGUAGES = ["en", "uk"]
     PARTS_OF_SPEECH = ["ADJ", "ADV", "NOUN", "VERB"]
     LANGUAGE_CODES = {"en": "en-US", "uk": "uk-UA", "ru": "ru-RU"}
 
