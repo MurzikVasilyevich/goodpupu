@@ -3,7 +3,7 @@ from datetime import datetime
 from airtable_helper import Airtable
 from audio_helper import download_music, create_voice_srt
 from openai_helper import open_ai
-from words_helper import Words, prepare_fmt
+from words_helper import Words
 from translation_helper import Translations
 import settings as s
 
@@ -74,8 +74,9 @@ class Texter:
                 self.texts['query'][lang] = self.chunk.record["fields"][f"{lang}_q"]
                 self.texts['result'][lang] = self.chunk.record["fields"][f"{lang}"]
         else:
-            self.words = Words()
-            self.query = (prepare_fmt(self.chunk.source.format["fields"]["Format"])).format(**vars(self.words)["words"])
+            # self.words = Words()
+            self.query = Words(self.chunk.source.format["fields"]["Format"]).result
+            # self.query = (prepare_fmt(self.chunk.source.format["fields"]["Format"])).format(**vars(self.words)["words"])
             self.open_ai_result = open_ai(f"Write a {self.chunk.source.genre['fields']['Name']} about how" +
                                           self.query).strip()
             self.texts = Translations(self, self.languages).texts

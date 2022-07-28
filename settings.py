@@ -7,11 +7,11 @@ def eval_bool(value):
 
 
 class POST:
-    GENERATE_RECORDS = eval_bool('GENERATE_RECORDS')
+    GENERATE_RECORDS = True #eval_bool('GENERATE_RECORDS')
     TELEGRAM = eval_bool('POST_TELEGRAM')
     VIMEO = eval_bool('POST_VIMEO')
     DROPBOX = eval_bool('POST_DROPBOX')
-    LOCAL = False
+    LOCAL = True
     AIRTABLE = True
     CREATE_AUDIO = True
     CREATE_VIDEO = True

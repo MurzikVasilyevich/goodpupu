@@ -1,8 +1,10 @@
 import logging.config
 import random
 import nltk
+import requests
 from nltk.corpus import wordnet as wn
 import settings as s
+from transliterate import translit
 
 nltk.download('wordnet')
 nltk.download('omw-1.4')
@@ -26,10 +28,28 @@ def get_word(pos):
     return [i.replace("_", " ") for i in words]
 
 
+def get_int_org():
+    request = requests.get("https://petscan.wmflabs.org/?psid=22536371&format=plain")
+    company = request.text.split("\n")[0]
+    company_transl = translit(company, "ru", reversed=True)
+    return company_transl
+
+
+def get_rus_org():
+    nouns = (requests.get("https://petscan.wmflabs.org/?psid=22536392&format=plain")).text.split("\n")
+    joined_nouns = " ".join(nouns[0:2]).title().replace(" ", "")
+    company = f"Рос{joined_nouns}"
+    company_transl = translit(company, "ru", reversed=True)
+    return company_transl
+
+
 class Words:
-    def __init__(self):
+    def __init__(self, fmt):
         self.words = {}
         self.get_words()
+        self.format = fmt
+        self.fmt = self.prepare_fmt()
+        self.result = self.fmt.format(**self.words)
 
     def get_words(self):
         logging.info("Getting random words")
@@ -37,13 +57,15 @@ class Words:
         for pos in poss:
             self.words[pos] = get_word(pos)
         self.words["VERB"] = [make_3sg_form(i) for i in self.words["VERB"]]
+        self.words["INT_ORG"] = get_int_org()
+        self.words["RUS_ORG"] = get_rus_org()
 
-
-def prepare_fmt(fmt):
-    poss = s.LINGUISTIC.PARTS_OF_SPEECH
-    for pos in poss:
-        op = 0
-        while fmt.find(f"{{{pos}}}") != -1:
-            fmt = fmt.replace(f"{{{pos}}}", f"{{{pos}[{op}]}}", 1)
-            op += 1
-    return fmt
+    def prepare_fmt(self):
+        fmt = self.format
+        poss = list(self.words.keys())
+        for pos in poss:
+            op = 0
+            while fmt.find(f"{{{pos}}}") != -1:
+                fmt = fmt.replace(f"{{{pos}}}", f"{{{pos}[{op}]}}", 1)
+                op += 1
+        return fmt
