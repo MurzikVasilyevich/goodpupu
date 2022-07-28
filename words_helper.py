@@ -32,7 +32,7 @@ def get_int_org():
     request = requests.get("https://petscan.wmflabs.org/?psid=22536371&format=plain")
     company = request.text.split("\n")[0]
     company_transl = translit(company, "ru", reversed=True)
-    return company_transl
+    return [company_transl]
 
 
 def get_rus_org():
@@ -40,7 +40,7 @@ def get_rus_org():
     joined_nouns = " ".join(nouns[0:2]).title().replace(" ", "")
     company = f"Рос{joined_nouns}"
     company_transl = translit(company, "ru", reversed=True)
-    return company_transl
+    return [company_transl]
 
 
 class Words:
