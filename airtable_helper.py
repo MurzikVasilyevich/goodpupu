@@ -45,7 +45,7 @@ class Airtable:
         return self.tables["records"].create(translations)
 
     def get_confirmed(self):
-        queued = self.tables["records"].first(formula="AND(confirmed=1,published=0,en)")
+        queued = (self.tables["records"].all(formula="AND(confirmed=1,published=0,en)",sort=[('id', 'desc')]))[0]
         if not queued:
             logging.info("!!!No queued records!!!")
         return queued
