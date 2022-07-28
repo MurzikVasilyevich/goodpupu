@@ -11,7 +11,7 @@ class POST:
     TELEGRAM = eval_bool('POST_TELEGRAM')
     VIMEO = eval_bool('POST_VIMEO')
     DROPBOX = eval_bool('POST_DROPBOX')
-    LOCAL = True
+    LOCAL = False
     AIRTABLE = True
     CREATE_AUDIO = True
     CREATE_VIDEO = True
