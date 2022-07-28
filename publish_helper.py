@@ -49,10 +49,10 @@ class PublishManager:
                 self.post_telegram(out_clip, lang, query, post)
             if s.POST.VIMEO:
                 self.post_vimeo(out_clip, lang, query, text)
-            if s.POST.LOCAL:
-                self.store_local(self.chunk.files.video['srt'][lang], lang)
             if s.POST.DROPBOX:
                 self.store_dropbox(lang)
+            if s.POST.LOCAL:
+                self.store_local(self.chunk.files.video['srt'][lang], lang)
             if s.POST.TELEGRAM or s.POST.VIMEO or s.POST.LOCAL or s.POST.DROPBOX:
                 self.db.update_status("published", True)
         logger.info("Finished PublishManager messaging")
