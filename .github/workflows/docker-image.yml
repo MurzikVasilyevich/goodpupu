@@ -39,7 +39,7 @@ jobs:
           VIMEO_TOKEN: ${{ secrets.VIMEO_TOKEN }}
           VIMEO_KEY: ${{ secrets.VIMEO_KEY }}
           VIMEO_SECRET: ${{ secrets.VIMEO_SECRET }}
-          DROPBOX_ACCESS_TOKEN: ${{ secrets.DROPBOX_ACCESS_TOKEN }}
+          DROPBOX_ACCESS_TOKEN: ${{ github.event.client_payload.DROPBOX_ACCESS_TOKEN }}
           BATCH: ${{ github.event.client_payload.batch }}
           GENERATE_RECORDS: ${{ github.event.client_payload.generate_records }}
           POST_TELEGRAM: ${{ github.event.client_payload.post_telegram }}
