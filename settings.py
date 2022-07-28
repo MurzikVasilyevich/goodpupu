@@ -2,12 +2,16 @@ import ast
 import os
 
 
+def eval_bool(value):
+    return eval((os.environ[value]).capitalize())
+
+
 class POST:
-    GENERATE_RECORDS = eval((os.environ['GENERATE_RECORDS']).capitalize())
-    TELEGRAM = False
-    VIMEO = False
+    GENERATE_RECORDS = eval_bool('GENERATE_RECORDS')
+    TELEGRAM = eval_bool('POST_TELEGRAM')
+    VIMEO = eval_bool('POST_VIMEO')
+    DROPBOX = eval_bool('POST_DROPBOX')
     LOCAL = False
-    DROPBOX = True
     AIRTABLE = True
     CREATE_AUDIO = True
     CREATE_VIDEO = True

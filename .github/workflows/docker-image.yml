@@ -3,12 +3,6 @@ name: py
 on:
  repository_dispatch:
  workflow_dispatch:
-  inputs:
-      batch:
-        description: 'Batch size'     
-        required: false
-        default: 10
-        type: number
 # schedule:
 #    - cron: '*/15 * * * *'
 
@@ -48,3 +42,6 @@ jobs:
           DROPBOX_ACCESS_TOKEN: ${{ secrets.DROPBOX_ACCESS_TOKEN }}
           BATCH: ${{ github.event.client_payload.batch }}
           GENERATE_RECORDS: ${{ github.event.client_payload.generate_records }}
+          POST_TELEGRAM: ${{ github.event.client_payload.post_telegram }}
+          POST_VIMEO: ${{ github.event.client_payload.post_vimeo }}
+          POST_DROPBOX: ${{ github.event.client_payload.post_dropbox }}
