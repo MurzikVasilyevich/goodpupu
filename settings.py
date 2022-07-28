@@ -7,7 +7,7 @@ def eval_bool(value):
 
 
 class POST:
-    GENERATE_RECORDS = True #eval_bool('GENERATE_RECORDS')
+    GENERATE_RECORDS = eval_bool('GENERATE_RECORDS')
     TELEGRAM = eval_bool('POST_TELEGRAM')
     VIMEO = eval_bool('POST_VIMEO')
     DROPBOX = eval_bool('POST_DROPBOX')
